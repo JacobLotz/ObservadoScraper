@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+# Scrape results
+*.kml
+
+
 # C extensions
 *.so
 
