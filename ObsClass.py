@@ -3,6 +3,7 @@ from urllib.request import urlopen as uReq
 import re
 import simplekml
 import time
+import json
 
 
 # Base class containing methods to get soup and set parameters.
@@ -59,10 +60,14 @@ class ObsCollection(ScrapeBase):
       print('Starting to update the selffind ranking')
 
       # Get links to relevant observations --> Filter should be here
-      self.GetObservations();
+      self.ImportPoints()
+      self.GetObservations()
       self.FindSelfFinds()
 
-
+   def ImportPoints(self):
+      self.Points = {}
+      with open("points.json", "r") as config_file:
+         self.Points = json.load(config_file)
       
 
    # Method for collecting all the observations from all pages from the given link
@@ -96,7 +101,9 @@ class ObsCollection(ScrapeBase):
          if LastPage == None:
             IfEnd = True
             print('Currently in page ' + str(Page)) 
-            print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n\n")
+            print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
+
+
 
 
 
@@ -117,13 +124,18 @@ class ObsCollection(ScrapeBase):
 
          self.LinkObs = iLink
          self.CorrectLinkObs()
+
          CurObservation = Observation(self.LinkObs)
          NoGps = CurObservation.GetData();
          # Skip if no gpsdata
          if NoGps is False:
             CurObservation.WriteKMLLine(self.Kml)
 
+
+
+
    def FindSelfFinds(self):
+      PointsTotal = 0
       self.Obs = self.Obs[::-1]
       i = 0 
       for iLink in self.Obs:
@@ -147,7 +159,11 @@ class ObsCollection(ScrapeBase):
          if NoGps is False:
             IfSelf = CurObservation.CheckSelffind()
             if IfSelf:
+               CurObservation.AssignPoints(self.Points)
+               PointsTotal +=CurObservation.Point
                CurObservation.WriteOutputLine(self.File)
+      self.File.writelines('{:<20}{:>6}'.format("Totaal: ",  PointsTotal))
+
 
 
    # Method to modify a link to an observation such that is is an actual weblink. Not
@@ -165,6 +181,9 @@ class ObsCollection(ScrapeBase):
 
    def SetOutputFile(self, File):
       self.File = File
+
+
+
 
 
 
@@ -218,10 +237,12 @@ class Observation(ScrapeBase):
       if self.Description:
          self.Description = self.Description.find("p").contents[0]
 
-      
-
-      
       return False
+
+
+
+
+
 
 
    # Method to write the observation data to the .kml file. If new data is required,
@@ -239,6 +260,11 @@ class Observation(ScrapeBase):
 
 
    def WriteOutputLine(self, File):
-      File.writelines('{:<20}{:<10}{:<60}'.format(self.Name, self.MonthDay, self.Location))
+      File.writelines('{:<20}{:>6}{:>1}{:<10}{:<60}'.format(self.Name, self.Point," " ,self.MonthDay, self.Location))
       File.writelines('\n')
+
+   def AssignPoints(self, Points):
+      self.Point = Points[self.Name]
+
+
 
