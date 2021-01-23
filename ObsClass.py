@@ -162,7 +162,7 @@ class ObsCollection(ScrapeBase):
                CurObservation.AssignPoints(self.Points)
                PointsTotal +=CurObservation.Point
                CurObservation.WriteOutputLine(self.File)
-      self.File.writelines('{:<20}{:>6}'.format("Totaal: ",  PointsTotal))
+      self.File.writelines('{:<27}{:>6}'.format("Totaal: ",  PointsTotal))
 
 
 
@@ -260,7 +260,7 @@ class Observation(ScrapeBase):
 
 
    def WriteOutputLine(self, File):
-      File.writelines('{:<20}{:>6}{:>1}{:<10}{:<60}'.format(self.Name, self.Point," " ,self.MonthDay, self.Location))
+      File.writelines('{:<27}{:>6}{:>1}{:<10}{:<60}'.format(self.Name, self.Point," " ,self.MonthDay, self.Location))
       File.writelines('\n')
 
    def AssignPoints(self, Points):

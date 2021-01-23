@@ -9,8 +9,8 @@ today = date.today()
 File = open(r"results.txt","w+")
 
 # Write headers:
-File.writelines('{:<20}{:<6}{:<1}{:<10}{:<24}{:<20}'.format("Soort", "Punten", " ","Datum", "Locatie", "Laatste update: " + str(today)))
-File.writelines('\n---------------------------------------------------------------------------------------')
+File.writelines('{:<27}{:<6}{:<1}{:<10}{:<24}{:<20}'.format("Soort", "Punten", " ","Datum", "Locatie", "Laatste update: " + str(today)))
+File.writelines('\n----------------------------------------------------------------------------------------------')
 
 
 
