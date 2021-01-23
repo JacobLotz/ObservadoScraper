@@ -32,10 +32,8 @@ class ScrapeBase:
 # and a name.
 class ObsCollection(ScrapeBase):
 
-   def __init__(self, Link, Name):
-      self.Link = Link;
-      self.Name = Name;
-      self.SetParam();
+   def SetName(self, Name):
+      self.Name = Name
       
 
    # Method for performing the whole scraping process after initialization
@@ -52,6 +50,19 @@ class ObsCollection(ScrapeBase):
       self.ScrapePages()
       self.SaveKML()
       print("Saved as: " + self.Name)
+
+
+
+
+   def StartUpdateSelffindRanking(self):
+      print('\n-------------------------------------')
+      print('Starting to update the selffind ranking')
+
+      # Get links to relevant observations --> Filter should be here
+      self.GetObservations();
+      self.FindSelfFinds()
+
+
       
 
    # Method for collecting all the observations from all pages from the given link
@@ -72,19 +83,20 @@ class ObsCollection(ScrapeBase):
          Page +=1
 
          print('Currently in page %d\r'%Page, end="")
-         #print('Currently in page ' + str(page), end="") 
-
-
          self.Link = BaseLink + str(Page)
          self.GetSoup()
+
          for link in self.PageSoup.findAll('a', attrs={'href': re.compile("^/observation/")}):
             self.Obs.append(link.get('href'))
-         
+
+
+         # Check if on last page, if so: end loop.
          LastPage = self.PageSoup.findAll('li', attrs={'last'})[0].find('a').get('href')
+
          if LastPage == None:
             IfEnd = True
             print('Currently in page ' + str(Page)) 
-            print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.")
+            print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n\n")
 
 
 
@@ -105,11 +117,38 @@ class ObsCollection(ScrapeBase):
 
          self.LinkObs = iLink
          self.CorrectLinkObs()
-         Observation = Observation(self.LinkObs)
-         NoGps = Observation.GetData();
+         CurObservation = Observation(self.LinkObs)
+         NoGps = CurObservation.GetData();
          # Skip if no gpsdata
          if NoGps is False:
-            Observation.WriteKMLLine(self.Kml)
+            CurObservation.WriteKMLLine(self.Kml)
+
+   def FindSelfFinds(self):
+      self.Obs = self.Obs[::-1]
+      i = 0 
+      for iLink in self.Obs:
+         # Optional wait to avoid suspicion
+         time.sleep(self.Wait)
+
+         i+=1
+         ip = i/len(self.Obs)*100
+         if ip < 100:
+            print('Looking through pages [%d%%]\r'%ip, end="") 
+         else:
+            print('Looking through pages [100%]')
+
+         self.LinkObs = iLink
+         self.CorrectLinkObs()
+
+         CurObservation = Observation(self.LinkObs)
+         NoGps = CurObservation.GetData();
+
+         # Check if selffind
+         if NoGps is False:
+            IfSelf = CurObservation.CheckSelffind()
+            if IfSelf:
+               CurObservation.WriteOutputLine(self.File)
+
 
    # Method to modify a link to an observation such that is is an actual weblink. Not
    # an internal link of waarneming.nl.
@@ -123,6 +162,12 @@ class ObsCollection(ScrapeBase):
    # Saves the created .kml file to self.Name.
    def SaveKML(self):
       self.Kml.save(self.Name, format=True)
+
+   def SetOutputFile(self, File):
+      self.File = File
+
+
+
 
 
 # Class that is used to get the required data of an observation if its link is given. 
@@ -147,10 +192,16 @@ class Observation(ScrapeBase):
       self.Year =  DateTimeList[0]
       self.Month = DateTimeList[1]
       self.Day =   DateTimeList[2]
+      self.MonthDay = DateTimeList[2] + "-" + DateTimeList[1]
       if len(DateTimeList) == 4:
          self.Time =  DateTimeList[3]
       else:
          self.Time = '-'
+
+      # Get location
+      self.Location = info[4].text.strip()
+
+
 
       # Location: skip if obscured
       location = self.PageSoup.find_all("span",{"class": "teramap-coordinates-coords"})
@@ -162,6 +213,14 @@ class Observation(ScrapeBase):
       self.Latitude = location[0]
       self.Longitude = location[1]
 
+      # Find description
+      self.Description = self.PageSoup.find("div", {"class": "goog-trans-section"})
+      if self.Description:
+         self.Description = self.Description.find("p").contents[0]
+
+      
+
+      
       return False
 
 
@@ -170,4 +229,16 @@ class Observation(ScrapeBase):
    def WriteKMLLine(self, Kml):
       Kml.newpoint(name = self.Name, coords = [(self.Longitude,self.Latitude)])
       #, description='Date: ' + self.DateTime
+
+   def CheckSelffind(self):
+      if self.Description:
+         if "Self" in self.Description:
+            return True
+         if "self" in self.Description:
+            return True
+
+
+   def WriteOutputLine(self, File):
+      File.writelines('{:<20}{:<10}{:<60}'.format(self.Name, self.MonthDay, self.Location))
+      File.writelines('\n')
 
