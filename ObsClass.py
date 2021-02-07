@@ -5,6 +5,11 @@ import simplekml
 import time
 import json
 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from bs4 import BeautifulSoup
+import time
+
 
 # Base class containing methods to get soup and set parameters.
 class ScrapeBase:
@@ -15,13 +20,24 @@ class ScrapeBase:
    def SetParam(self):
       self.Wait = 0
 
+
+
+
    
    def GetSoup(self):
-      uClient = uReq(self.Link)
-      html = uClient.read()
-      uClient.close
-      self.PageSoup = soup(html, "html.parser")
-      print
+
+
+      #new:
+      self.browser.get(self.Link)
+      self.PageSoup = soup(self.browser.page_source, "html.parser")
+      #soup = BeautifulSoup(browser.page_source, 'lxml')
+
+      #old:
+      #uClient = uReq(self.Link)
+      #html = uClient.read()
+      #uClient.close
+      #self.PageSoup = soup(html, "html.parser")
+      
 
    def PrintSoup(self):
       print(self.PageSoup)
@@ -32,6 +48,41 @@ class ScrapeBase:
 # the class Observation to get its data. Class can be constructed by giving a link 
 # and a name.
 class ObsCollection(ScrapeBase):
+
+
+
+   def CreateWebDriver(self):
+      pathdriver = "/data/localhome/jelotz/Documents/WebDriver/chromedriver"
+      self.browser = webdriver.Chrome(pathdriver)
+
+   def LogIn(self):
+      # Activate Phantom(headless) and deactivate Chrome to not load browser
+      #browser = webdriver.PhantomJS()
+
+      url = 'https://waarneming.nl/accounts/login/?next=/'
+      self.browser.get(url)
+      user_name = self.browser.find_element_by_name("login")
+      user_name.send_keys("lotzzzz")
+      password = self.browser.find_element_by_name('password')
+      password.send_keys("jacoblotz")
+      password.send_keys(Keys.RETURN)
+
+      time.sleep(3)
+
+
+      
+       
+      # Give source code to BeautifulSoup
+      #soup = BeautifulSoup(browser.page_source, 'lxml')
+
+   def SetLang(self):
+      url = "https://waarneming.nl/generic/select-language-modal/"
+      self.browser.get(url)
+      button = self.browser.find_elements_by_name("language")
+      button = button[35]
+      button.click()
+      
+
 
    def SetName(self, Name):
       self.Name = Name
@@ -61,6 +112,9 @@ class ObsCollection(ScrapeBase):
 
       # Get links to relevant observations --> Filter should be here
       self.ImportPoints()
+      self.CreateWebDriver()
+      self.LogIn()
+      self.SetLang()
       self.GetObservations()
       self.FindSelfFinds()
 
@@ -125,7 +179,7 @@ class ObsCollection(ScrapeBase):
          self.LinkObs = iLink
          self.CorrectLinkObs()
 
-         CurObservation = Observation(self.LinkObs)
+         CurObservation = Observation(self.LinkObs, self.browser)
          NoGps = CurObservation.GetData();
          # Skip if no gpsdata
          if NoGps is False:
@@ -152,7 +206,7 @@ class ObsCollection(ScrapeBase):
          self.LinkObs = iLink
          self.CorrectLinkObs()
 
-         CurObservation = Observation(self.LinkObs)
+         CurObservation = Observation(self.LinkObs, self.browser)
          NoGps = CurObservation.GetData();
 
          # Check if selffind
@@ -192,6 +246,12 @@ class ObsCollection(ScrapeBase):
 # Class that is used to get the required data of an observation if its link is given. 
 # Can be called seperately to test on a single observation.
 class Observation(ScrapeBase):
+
+
+   def __init__(self, Link, browser):
+      self.browser = browser;
+      self.Link = Link;
+      self.SetParam()
 
    # Method that extracts the data of the webpage of an observation. Can be extended, but
    # it has to be kept in mind that if new data is added, WriteKMLLine() has to be modified
