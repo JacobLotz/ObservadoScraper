@@ -3,14 +3,12 @@ from ObsClass import *
 from datetime import date
 
 today = date.today()
-
-
-
 File = open(r"results.txt","w+")
 
 # Write headers:
 File.writelines('{:<27}{:<6}{:<1}{:<10}{:<24}{:<20}'.format("Soort", "Punten", " ","Datum", "Locatie", "Laatste update: " + str(today)))
 File.writelines('\n----------------------------------------------------------------------------------------------')
+
 
 
 
@@ -38,6 +36,7 @@ link = "https://waarneming.nl/users/41541/observations/?after_date=2021-01-01&be
 collection = ObsCollection(link)
 collection.SetOutputFile(File)
 collection.StartUpdateSelffindRanking()
+
 
 
 File.close()

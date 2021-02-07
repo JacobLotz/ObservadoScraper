@@ -235,7 +235,10 @@ class Observation(ScrapeBase):
       # Find description
       self.Description = self.PageSoup.find("div", {"class": "goog-trans-section"})
       if self.Description:
-         self.Description = self.Description.find("p").contents[0]
+         if self.Description.find("p"):
+            self.Description = self.Description.find("p").contents[0]
+
+         
 
       return False
 
