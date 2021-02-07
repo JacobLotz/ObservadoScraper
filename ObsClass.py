@@ -4,9 +4,9 @@ import re
 import simplekml
 import time
 import json
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import time
 
@@ -52,8 +52,16 @@ class ObsCollection(ScrapeBase):
 
 
    def CreateWebDriver(self):
+      chrome_options = Options()
+      chrome_options.add_argument("--disable-extensions")
+      chrome_options.add_argument("--disable-gpu")
+      chrome_options.add_argument("--no-sandbox") # linux only
+      chrome_options.add_argument("--headless")
       pathdriver = "/data/localhome/jelotz/Documents/WebDriver/chromedriver"
-      self.browser = webdriver.Chrome(pathdriver)
+      self.browser = webdriver.Chrome(executable_path = pathdriver, chrome_options = chrome_options)
+
+   def CloseWebDriver(self):
+      self.browser.quit()
 
    def LogIn(self):
       # Activate Phantom(headless) and deactivate Chrome to not load browser
@@ -67,13 +75,8 @@ class ObsCollection(ScrapeBase):
       password.send_keys("jacoblotz")
       password.send_keys(Keys.RETURN)
 
-      time.sleep(3)
 
 
-      
-       
-      # Give source code to BeautifulSoup
-      #soup = BeautifulSoup(browser.page_source, 'lxml')
 
    def SetLang(self):
       url = "https://waarneming.nl/generic/select-language-modal/"
@@ -98,9 +101,12 @@ class ObsCollection(ScrapeBase):
 
       # If all links are collected create kml and scrape the pages for the data
       print('Starting extraction of data of observations')
+      self.CreateWebDriver()
+      self.SetLang()
       self.CreateKML()
       self.ScrapePages()
       self.SaveKML()
+      self.CloseWebDriver()
       print("Saved as: " + self.Name)
 
 
@@ -117,6 +123,7 @@ class ObsCollection(ScrapeBase):
       self.SetLang()
       self.GetObservations()
       self.FindSelfFinds()
+      self.CloseWebDriver()
 
    def ImportPoints(self):
       self.Points = {}
