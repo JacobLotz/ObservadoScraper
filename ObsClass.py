@@ -19,14 +19,13 @@ class ScrapeBase:
 
    def SetParam(self):
       self.Wait = 0
+      self.IfOld = 1
 
 
 
 
    
    def GetSoup(self):
-
-
       #new:
       self.browser.get(self.Link)
       self.PageSoup = soup(self.browser.page_source, "html.parser")
@@ -178,10 +177,10 @@ class ObsCollection(ScrapeBase):
 
          i+=1
          ip = i/len(self.Obs)*100
-         if ip < 100:
-            print('Scraping pages [%d%%]\r'%ip, end="") 
-         else:
-            print('Scraping pages [100%]')
+         #if ip < 100:
+         #   print('Scraping pages [%d%%]\r'%ip, end="") 
+         #else:
+         #   print('Scraping pages [100%]')
 
          self.LinkObs = iLink
          self.CorrectLinkObs()
@@ -205,12 +204,13 @@ class ObsCollection(ScrapeBase):
 
          i+=1
          ip = i/len(self.Obs)*100
-         if ip < 100:
-            print('Looking through pages [%d%%]\r'%ip, end="") 
-         else:
-            print('Looking through pages [100%]')
+         #if ip < 100:
+         #   print('Looking through pages [%d%%]\r'%ip, end="") 
+         #else:
+         #   print('Looking through pages [100%]')
 
          self.LinkObs = iLink
+         print(self.LinkObs)
          self.CorrectLinkObs()
 
          CurObservation = Observation(self.LinkObs, self.browser)
@@ -230,7 +230,13 @@ class ObsCollection(ScrapeBase):
    # Method to modify a link to an observation such that is is an actual weblink. Not
    # an internal link of waarneming.nl.
    def CorrectLinkObs(self):
-      self.LinkObs = 'https://waarneming.nl'+self.LinkObs
+      if self.IfOld:
+         self.LinkObs = 'https://old.waarneming.nl/waarneming/view/'+self.LinkObs.split("/")[-2]
+
+      else:
+         self.LinkObs = 'https://waarneming.nl'+self.LinkObs
+         
+
 
    # Create .kml file to save observations to.
    def CreateKML(self):
@@ -266,48 +272,84 @@ class Observation(ScrapeBase):
    def GetData(self):
       self.GetSoup();
 
+      if self.IfOld:
+         header = str(self.PageSoup.head.title.text).split("|")[0]  # Find description of observation
+         # Find name of species
+         self.Name = header.split(" - ")[0]  # Find name of observation
 
-      self.Name = self.PageSoup.find_all("span",{"class": "species-common-name"})[0].text.strip()
-      
-      # Datum, Aantal, Levensstadium, Activiteit, Locatie, Waarnemer, Protocol, Telmethode, Methode
-      # Only date is implemented
-      infotable = self.PageSoup.find_all("table", {"class": "table table-condensed", "id": "observation_details"})
-      info = infotable[0].find_all("td")
-      self.DateTime = info[0].text.strip()
-      DateTimeList = self.DateTime.replace('-', ' ').split(' ')
-      self.Year =  DateTimeList[0]
-      self.Month = DateTimeList[1]
-      self.Day =   DateTimeList[2]
-      self.MonthDay = DateTimeList[2] + "-" + DateTimeList[1]
-      if len(DateTimeList) == 4:
-         self.Time =  DateTimeList[3]
-      else:
-         self.Time = '-'
+         gps = str(self.PageSoup.head.find_all("script")[9]).split('var')
+         self.Longitude = gps[1].replace('lon =', '').replace(';\n', '')        # Longitude of observation
+         self.Latitude = gps[2].replace('lat = ', '').replace(';\n', '')       # Latitude of observation
 
-      # Get location
-      self.Location = info[4].text.strip()
+         # Collect details data
+         details = self.PageSoup.find_all("p",{"class": "info"})
+         if not details:
+            self.Description = ''
+         else:
+            self.Description = [k.text for k in details][0]
 
+         # Find other data of observation in table
+         table = self.PageSoup.find_all("table")[2].find_all("td")
+         table = [k.text for k in table]
 
+         if 'Datum' in table:
+            self.DateTime = table[table.index('Datum') + 1]
+         DateTimeList = self.DateTime.replace('-', ' ').split(' ')
+         self.Year =  DateTimeList[0]
+         self.Month = DateTimeList[1]
+         self.Day =   DateTimeList[2]
+         self.MonthDay = DateTimeList[2] + "-" + DateTimeList[1]
 
-      # Location: skip if obscured
-      location = self.PageSoup.find_all("span",{"class": "teramap-coordinates-coords"})
-      if location:
-         location = location[0].text.strip().split(", ")
-      else:
-         return True
-      
-      self.Latitude = location[0]
-      self.Longitude = location[1]
+         if len(DateTimeList) == 4:
+            self.Time =  DateTimeList[3]
+         else:
+            self.Time = '-'
 
-      # Find description
-      self.Description = self.PageSoup.find("div", {"class": "goog-trans-section"})
-      if self.Description:
-         if self.Description.find("p"):
-            self.Description = self.Description.find("p").contents[0]
-
+         if 'Gebied' in table:
+            self.Location = table[table.index('Gebied') + 1]
          
 
-      return False
+
+      else: 
+         self.Name = self.PageSoup.find_all("span",{"class": "species-common-name"})[0].text.strip()
+      
+         # Datum, Aantal, Levensstadium, Activiteit, Locatie, Waarnemer, Protocol, Telmethode, Methode
+         # Only date is implemented
+         infotable = self.PageSoup.find_all("table", {"class": "table table-condensed", "id": "observation_details"})
+         info = infotable[0].find_all("td")
+         self.DateTime = info[0].text.strip()
+         DateTimeList = self.DateTime.replace('-', ' ').split(' ')
+         self.Year =  DateTimeList[0]
+         self.Month = DateTimeList[1]
+         self.Day =   DateTimeList[2]
+         self.MonthDay = DateTimeList[2] + "-" + DateTimeList[1]
+         if len(DateTimeList) == 4:
+            self.Time =  DateTimeList[3]
+         else:
+            self.Time = '-'
+
+         # Get location
+         self.Location = info[4].text.strip()
+
+
+
+         # Location: skip if obscured
+         location = self.PageSoup.find_all("span",{"class": "teramap-coordinates-coords"})
+         if location:
+            location = location[0].text.strip().split(", ")
+         else:
+            return True
+      
+         self.Latitude = location[0]
+         self.Longitude = location[1]
+
+         # Find description
+         self.Description = self.PageSoup.find("div", {"class": "goog-trans-section"})
+         if self.Description:
+            if self.Description.find("p"):
+               self.Description = self.Description.find("p").contents[0]
+
+         return False
 
 
 
