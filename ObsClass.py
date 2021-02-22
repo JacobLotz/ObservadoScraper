@@ -52,11 +52,11 @@ class ObsCollection(ScrapeBase):
 
    def CreateWebDriver(self):
       chrome_options = Options()
-      #chrome_options.add_argument("--disable-extensions")
-      #chrome_options.add_argument("--disable-gpu")
-      #chrome_options.add_argument("--no-sandbox") # linux only
-      #chrome_options.add_argument("--headless")
-      pathdriver = "/data/localhome/jelotz/Documents/WebDriver/chromedriver"
+      chrome_options.add_argument("--disable-extensions")
+      chrome_options.add_argument("--disable-gpu")
+      chrome_options.add_argument("--no-sandbox") # linux only
+      chrome_options.add_argument("--headless")
+      pathdriver = "/home/jelotz/chromedriver"
       self.browser = webdriver.Chrome(executable_path = pathdriver, chrome_options = chrome_options)
 
    def CloseWebDriver(self):
@@ -130,7 +130,7 @@ class ObsCollection(ScrapeBase):
       self.CreateWebDriver()
       self.LogInOld()
       self.SetLang()
-      self.GetObservations()
+      self.GetObservationsOld()
       self.FindSelfFinds()
       self.CloseWebDriver()
 
@@ -173,6 +173,44 @@ class ObsCollection(ScrapeBase):
             print('Currently in page ' + str(Page)) 
             print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
 
+   def GetObservationsOld(self):
+      self.Obs = [];
+
+      # Create variable link such that it is able to go through multiple pages
+      BaseLink = self.Link[0:-1]
+      Page = 0
+
+      print('Starting to retrieve links from overview pages')
+
+      # Find last page
+      self.GetSoup()
+      lastpage = int(str(self.PageSoup.find("td", colspan = True)).split(" | ")[1].split(" ")[0])
+
+      # Get links from page to observations
+      IfEnd = False
+      while IfEnd is not True:
+         time.sleep(self.Wait)
+         Page +=1
+
+         print('Currently in page %d\r'%Page, end="")
+         self.Link = BaseLink + str(Page)
+         self.GetSoup()
+
+         for link in self.PageSoup.findAll('a', attrs={'href': re.compile("^/waarneming/view/")}):
+            self.Obs.append(link.get('href'))
+
+         if Page == lastpage:
+            IfEnd = True
+            print('Currently in page ' + str(Page)) 
+            print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
+      # Remove duplicates
+      TempObs = []
+      for i in self.Obs:
+         if i not in TempObs:
+            TempObs.append(i)
+
+
+      self.Obs = TempObs
 
 
 
@@ -187,10 +225,10 @@ class ObsCollection(ScrapeBase):
 
          i+=1
          ip = i/len(self.Obs)*100
-         #if ip < 100:
-         #   print('Scraping pages [%d%%]\r'%ip, end="") 
-         #else:
-         #   print('Scraping pages [100%]')
+         if ip < 100:
+            print('Scraping pages [%d%%]\r'%ip, end="") 
+         else:
+            print('Scraping pages [100%]')
 
          self.LinkObs = iLink
          self.CorrectLinkObs()
@@ -220,7 +258,6 @@ class ObsCollection(ScrapeBase):
          #   print('Looking through pages [100%]')
 
          self.LinkObs = iLink
-         print(self.LinkObs)
          self.CorrectLinkObs()
 
          CurObservation = Observation(self.LinkObs, self.browser)
@@ -228,9 +265,8 @@ class ObsCollection(ScrapeBase):
 
          # Check if selffind
          if NoGps is False:
-            print("yesGPS")
             IfSelf = CurObservation.CheckSelffind()
-            if IfSelf:
+            if ((IfSelf) and (CurObservation.Name in self.Points)):
                CurObservation.AssignPoints(self.Points)
                PointsTotal +=CurObservation.Point
                CurObservation.WriteOutputLine(self.File)
@@ -242,7 +278,7 @@ class ObsCollection(ScrapeBase):
    # an internal link of waarneming.nl.
    def CorrectLinkObs(self):
       if self.IfOld:
-         self.LinkObs = 'https://old.waarneming.nl/waarneming/view/'+self.LinkObs.split("/")[-2]
+         self.LinkObs = 'https://old.waarneming.nl'+self.LinkObs
 
       else:
          self.LinkObs = 'https://waarneming.nl'+self.LinkObs
@@ -289,14 +325,12 @@ class Observation(ScrapeBase):
          self.Name = header.split(" - ")[0]  # Find name of observation
 
          scripts = self.PageSoup.head.find_all("script")
-         #print(len(scripts))
+
          for i in range(0, len(scripts)):
             if "lon" in str(scripts[i]):
                gps = str(self.PageSoup.head.find_all("script")[i]).split('var')
 
 
-         #gps = str(self.PageSoup.head.find_all("script")[9]).split('var')
-         #print(gps)
          if gps:
             self.Longitude = gps[1].replace('lon =', '').replace(';\n', '')        # Longitude of observation
             self.Latitude = gps[2].replace('lat = ', '').replace(';\n', '')      # Latitude of observation
@@ -309,6 +343,9 @@ class Observation(ScrapeBase):
             self.Description = ''
          else:
             self.Description = [k.text for k in details][0]
+            if len(details) == 2:
+               self.Description = details[1]
+
 
          # Find other data of observation in table
          table = self.PageSoup.find_all("table")[2].find_all("td")
@@ -328,12 +365,7 @@ class Observation(ScrapeBase):
             self.Time = '-'
 
          if 'Gebied' in table:
-            self.Location = table[table.index('Gebied') + 1]
-
-         print(self.Name)
-         print(self.Description)
-
-
+            self.Location = table[table.index('Gebied') + 1].strip()
          return False
          
 
@@ -394,7 +426,6 @@ class Observation(ScrapeBase):
    def CheckSelffind(self):
       if self.Description:
          if "Self" in self.Description:
-            print("Found selfie")
             return True
          if "self" in self.Description:
             return True
