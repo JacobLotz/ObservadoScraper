@@ -52,10 +52,10 @@ class ObsCollection(ScrapeBase):
 
    def CreateWebDriver(self):
       chrome_options = Options()
-      chrome_options.add_argument("--disable-extensions")
-      chrome_options.add_argument("--disable-gpu")
-      chrome_options.add_argument("--no-sandbox") # linux only
-      chrome_options.add_argument("--headless")
+      #chrome_options.add_argument("--disable-extensions")
+      #chrome_options.add_argument("--disable-gpu")
+      #chrome_options.add_argument("--no-sandbox") # linux only
+      #chrome_options.add_argument("--headless")
       pathdriver = "/data/localhome/jelotz/Documents/WebDriver/chromedriver"
       self.browser = webdriver.Chrome(executable_path = pathdriver, chrome_options = chrome_options)
 
@@ -74,7 +74,17 @@ class ObsCollection(ScrapeBase):
       password.send_keys("jacoblotz")
       password.send_keys(Keys.RETURN)
 
+   def LogInOld(self):
+      # Activate Phantom(headless) and deactivate Chrome to not load browser
+      #browser = webdriver.PhantomJS()
 
+      url = 'https://old.waarneming.nl/user/login'
+      self.browser.get(url)
+      user_name = self.browser.find_element_by_name("user")
+      user_name.send_keys("lotzzzz")
+      password = self.browser.find_element_by_name('password')
+      password.send_keys("jacoblotz")
+      password.send_keys(Keys.RETURN)
 
 
    def SetLang(self):
@@ -118,7 +128,7 @@ class ObsCollection(ScrapeBase):
       # Get links to relevant observations --> Filter should be here
       self.ImportPoints()
       self.CreateWebDriver()
-      self.LogIn()
+      self.LogInOld()
       self.SetLang()
       self.GetObservations()
       self.FindSelfFinds()
@@ -218,6 +228,7 @@ class ObsCollection(ScrapeBase):
 
          # Check if selffind
          if NoGps is False:
+            print("yesGPS")
             IfSelf = CurObservation.CheckSelffind()
             if IfSelf:
                CurObservation.AssignPoints(self.Points)
@@ -277,9 +288,20 @@ class Observation(ScrapeBase):
          # Find name of species
          self.Name = header.split(" - ")[0]  # Find name of observation
 
-         gps = str(self.PageSoup.head.find_all("script")[9]).split('var')
-         self.Longitude = gps[1].replace('lon =', '').replace(';\n', '')        # Longitude of observation
-         self.Latitude = gps[2].replace('lat = ', '').replace(';\n', '')       # Latitude of observation
+         scripts = self.PageSoup.head.find_all("script")
+         #print(len(scripts))
+         for i in range(0, len(scripts)):
+            if "lon" in str(scripts[i]):
+               gps = str(self.PageSoup.head.find_all("script")[i]).split('var')
+
+
+         #gps = str(self.PageSoup.head.find_all("script")[9]).split('var')
+         #print(gps)
+         if gps:
+            self.Longitude = gps[1].replace('lon =', '').replace(';\n', '')        # Longitude of observation
+            self.Latitude = gps[2].replace('lat = ', '').replace(';\n', '')      # Latitude of observation
+         else:
+            return True
 
          # Collect details data
          details = self.PageSoup.find_all("p",{"class": "info"})
@@ -307,6 +329,12 @@ class Observation(ScrapeBase):
 
          if 'Gebied' in table:
             self.Location = table[table.index('Gebied') + 1]
+
+         print(self.Name)
+         print(self.Description)
+
+
+         return False
          
 
 
@@ -366,6 +394,7 @@ class Observation(ScrapeBase):
    def CheckSelffind(self):
       if self.Description:
          if "Self" in self.Description:
+            print("Found selfie")
             return True
          if "self" in self.Description:
             return True
