@@ -507,6 +507,7 @@ class Observation(ScrapeBase):
 
       if 'Gebied' in table:
          self.Location = table[table.index('Gebied') + 1].strip()
+         self.Location = self.Location.split("]")[0]+"]"
       return False
 
 
