@@ -38,5 +38,5 @@ collection.SetOutputFile(File)
 collection.StartUpdateSelffindRanking()
 
 
-
+File.writelines('\n')
 File.close()
