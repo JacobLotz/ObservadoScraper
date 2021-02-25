@@ -101,7 +101,7 @@
    "Blauwstaart"                :22,
    "Humes Braamsluiper"         :11,
    "Vale Gierzwaluw"            :25,
-   "Rode Wouw"                  :0.5,
-   "Zwarte Wouw"                :0.5,
-   "Visarend"                   :0.5,
+   "Rode Wouw"                  :1,
+   "Zwarte Wouw"                :1,
+   "Visarend"                   :1,
 }
