@@ -147,7 +147,7 @@ class ObsCollection(ScrapeBase):
          self.ImportPoints()
          self.CreateWebDriver()
          self.LogInOld()
-         self.GetObservationsOld()
+         self.GetObservationsSelfOld()
          self.FindSelfFinds()
          self.CloseWebDriver()
       else:
@@ -187,6 +187,7 @@ class ObsCollection(ScrapeBase):
          self.Link = BaseLink + str(Page)
          self.GetSoup()
 
+
          for link in self.PageSoup.findAll('a', attrs={'href': re.compile("^/observation/")}):
             self.Obs.append(link.get('href'))
 
@@ -198,6 +199,8 @@ class ObsCollection(ScrapeBase):
             IfEnd = True
             print('Currently in page ' + str(Page)) 
             print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
+
+
 
 
    # Method for collecting all the observations from all pages from the given link for OLD website
@@ -238,6 +241,65 @@ class ObsCollection(ScrapeBase):
                if i not in TempObs:
                   TempObs.append(i)
             self.Obs = TempObs
+            print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
+   
+   # Method for collecting all the observations from all pages from the given link for OLD website
+   # This method should be called before ScrapePages() ONLY SAVING POTENTIAL SELFFINDS
+
+   def GetObservationsSelfOld(self):
+      self.Obs = [];
+
+      # Create variable link such that it is able to go through multiple pages
+      BaseLink = self.Link[0:-1]
+      Page = 0
+
+      print('Starting to retrieve links from overview pages')
+
+      # Find last page
+      self.GetSoup()
+      lastpage = int(str(self.PageSoup.find("td", colspan = True)).split(" | ")[1].split(" ")[0])
+
+
+      # Get links from page to observations
+      IfEnd = False
+      
+      while IfEnd is not True:
+         Page +=1
+         time.sleep(self.Wait)
+         print('Currently in page %d\r'%Page, end="")
+         self.Link = BaseLink + str(Page)
+         self.GetSoup()
+
+         links = self.PageSoup.findAll('a', attrs={'href': re.compile("^/waarneming/view/")})
+         species = self.PageSoup.findAll("span",{"class": ["z2", "z3"]})
+         testlinks = []
+         potentialselfobs = []
+         
+         i = 0
+         for sp in species:
+            testspecies = sp.get_text().split(" - ")[0]
+            if testspecies in self.Points:
+               potentialselfobs.append(i)
+            i+=1
+
+         for link in links:
+
+            testlinks.append(link.get('href'))
+
+         # Remove duplicates
+         TempObs = []
+         for i in range(0,len(testlinks),2):
+            TempObs.append(testlinks[i])
+         testlinks = TempObs
+
+        
+         # Get potential links
+         for i in potentialselfobs:
+            self.Obs.append(testlinks[i])
+
+         if Page == lastpage:
+            IfEnd = True
+            print('Currently in page ' + str(Page))
             print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
       
       
@@ -309,6 +371,7 @@ class ObsCollection(ScrapeBase):
                CurObservation.AssignPoints(self.Points)
                PointsTotal +=CurObservation.Point
                CurObservation.WriteOutputLine(self.File)
+      self.File.writelines('\n')
       self.File.writelines('{:<27}{:>6}'.format("Totaal: ",  PointsTotal))
 
 
