@@ -271,7 +271,7 @@ class ObsCollection(ScrapeBase):
          self.GetSoup()
 
          links = self.PageSoup.findAll('a', attrs={'href': re.compile("^/waarneming/view/")})
-         species = self.PageSoup.findAll("span",{"class": ["z2", "z3"]})
+         species = self.PageSoup.findAll("span",{"class": ["z2", "z3", "z4"]})
          testlinks = []
          potentialselfobs = []
          
@@ -283,7 +283,6 @@ class ObsCollection(ScrapeBase):
             i+=1
 
          for link in links:
-
             testlinks.append(link.get('href'))
 
          # Remove duplicates
@@ -301,6 +300,9 @@ class ObsCollection(ScrapeBase):
             IfEnd = True
             print('Currently in page ' + str(Page))
             print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
+
+
+      
       
       
 
