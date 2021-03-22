@@ -104,11 +104,12 @@ class ObsCollection(ScrapeBase):
 
       if self.IfOld:
          # Get links to relevant observations
+         self.CreateWebDriver()
          self.GetObservationsOld();
          
          # If all links are collected create kml and scrape the pages for the data
          print('Starting extraction of data of observations')
-         self.CreateWebDriver()
+         
          self.CreateKML()
          self.ScrapePages()
          self.SaveKML()
@@ -117,12 +118,13 @@ class ObsCollection(ScrapeBase):
 
       else:   
          # Get links to relevant observations
+         self.CreateWebDriver()
+         self.SetLang()
          self.GetObservations();
 
          # If all links are collected create kml and scrape the pages for the data
          print('Starting extraction of data of observations')
-         self.CreateWebDriver()
-         self.SetLang()
+
          self.CreateKML()
          self.ScrapePages()
          self.SaveKML()
@@ -396,7 +398,7 @@ class ObsCollection(ScrapeBase):
 
    # Saves the created .kml file to self.Name.
    def SaveKML(self):
-      self.Kml.save(self.Name, format=True)
+      self.Kml.save("out.kml", format=True)
 
    def SetOutputFile(self, File):
       self.File = File
@@ -580,8 +582,7 @@ class Observation(ScrapeBase):
    # Method to write the observation data to the .kml file. If new data is required,
    # it should first be obtained in GetData().
    def WriteKMLLine(self, Kml):
-      Kml.newpoint(name = self.Name, coords = [(self.Longitude,self.Latitude)])
-      #, description='Date: ' + self.DateTime
+      Kml.newpoint(name = self.Name, coords = [(self.Longitude,self.Latitude)], description='Date: ' + self.DateTime)
 
    # Method which checks if the observation is a selffind.
    def CheckSelffind(self):
