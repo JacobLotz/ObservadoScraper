@@ -9,6 +9,7 @@ __pycache__/
 
 # Results of ranking
 *.txt
+*.png
 
 
 # C extensions
