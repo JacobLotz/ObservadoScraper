@@ -1,9 +1,9 @@
 # Import classes
 from ObsClass import *
 
-link = "https://waarneming.nl/species/290/observations/?after_date=2021-01-01&before_date=2021-01-31&province=&advanced=on&page=1"
+link = "https://waarneming.nl/locations/22901/observations/?species=337&after_date=1992-01-17&before_date=2021-03-21&page=1"
 collection = ObsCollection(link)
-collection.SetName("Mibo_2021.kml")
+#collection.SetName("kortsnavel.kml")
 collection.StartScrapingProcess()
 
 
