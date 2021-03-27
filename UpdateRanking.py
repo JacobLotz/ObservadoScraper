@@ -88,7 +88,7 @@ rank = 0
 check  = 0
 df2 = df.copy()
 print('Ranking')
-while rank != 4:
+while rank <= df['Observer'].unique():
    maxpoints1 = 0
    maxpoints2 = 0
    for d in df['Observer'].unique():
@@ -101,8 +101,6 @@ while rank != 4:
 
    df2.drop(df[df['Observer'] == maxobserver].index, inplace = True)  
    print('{:<4}{:<15}{:>6}'.format(rank, maxobserver, maxpoints1))
-
-
 """
 
 
