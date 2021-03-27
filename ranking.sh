@@ -1,5 +1,6 @@
 # Edit crontab job using
-# crontab -b
+# crontab -e
+# service cron restart
 
 
 rm results.txt
