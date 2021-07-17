@@ -8,7 +8,10 @@ base = ScrapeBase(link)
 base.CreateWebDriver()
 base.GetSoup()
 
-print(base.PageSoup.find_all("svg",{"class": "leaflet-clickable"}))
+test = str(base.PageSoup.find("svg",{"class": "leaflet-zoom-animated"})).split("<g>")
+
+print(test)
+print(len(test))
 
 #.find_all("g")
 
