@@ -20,18 +20,23 @@ class ScrapeBase:
    def SetParam(self):
       self.Wait = 0
       self.chrome_options = Options()
-      #self.chrome_options.add_argument("--disable-extensions")
-      #self.chrome_options.add_argument("--disable-gpu")
-      #self.chrome_options.add_argument("--no-sandbox") # linux only
-      #self.chrome_options.add_argument("--headless")
+      self.chrome_options.add_argument("--disable-extensions")
+      self.chrome_options.add_argument("--disable-gpu")
+      self.chrome_options.add_argument("--no-sandbox") # linux only
+      self.chrome_options.add_argument("--headless")
       #self.chrome_options.page_load_strategy = 'eager'
       
-      #self.pathdriver = "/home/jelotz/chromedriver"
-      self.pathdriver = "/data/localhome/jelotz/Documents/WebDriver/chromedriver"
+      self.pathdriver = "/home/jelotz/chromedriver"
+      #self.pathdriver = "/data/localhome/jelotz/Documents/WebDriver/chromedriver"
       
 
 
    def GetSoup(self):
+      self.browser.get(self.Link)
+      self.PageSoup = soup(self.browser.page_source, "html.parser")
+
+
+   def GetSoupMig(self):
       wait_for_element = 10  # wait timeout in seconds
       self.browser.get(self.Link)
 
