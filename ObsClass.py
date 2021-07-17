@@ -14,11 +14,7 @@ from Observation import *
 # the class Observation to get its data. Class can be constructed by giving a link 
 # and a name.
 class ObsCollection(ScrapeBase):
-   def CreateWebDriver(self):
-      self.browser = webdriver.Chrome(executable_path = self.pathdriver, chrome_options = self.chrome_options)
 
-   def CloseWebDriver(self):
-      self.browser.quit()
 
    # Log into old website
    def LogIn(self):

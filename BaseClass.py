@@ -1,6 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup as soup
+import time
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 
 
@@ -18,17 +24,43 @@ class ScrapeBase:
       self.chrome_options.add_argument("--disable-gpu")
       self.chrome_options.add_argument("--no-sandbox") # linux only
       self.chrome_options.add_argument("--headless")
-      #self.pathdriver = "/home/jelotz/chromedriver"
-      self.pathdriver = "/data/localhome/jelotz/Documents/WebDriver/chromedriver"
+      #self.chrome_options.page_load_strategy = 'eager'
+      
+      self.pathdriver = "/home/jelotz/chromedriver"
+      #self.pathdriver = "/data/localhome/jelotz/Documents/WebDriver/chromedriver"
+      
 
 
-
-
-   
    def GetSoup(self):
+      #wait_for_element = 30  # wait timeout in seconds
       self.browser.get(self.Link)
+
+      #try:
+      #  WebDriverWait(self.browser, wait_for_element).until(
+      #      EC.alert_is_present("leaflet-clickable"))
+      #except TimeoutException as e:
+      #  print("Wait Timed out")
+      #  print(e)
+
+
       self.PageSoup = soup(self.browser.page_source, "html.parser")
 
    def PrintSoup(self):
-      print(self.PageSoup)
+      print(self.PageSoup.prettify)
 
+   def CreateWebDriver(self):
+      self.browser = webdriver.Chrome(executable_path = self.pathdriver, chrome_options = self.chrome_options)
+
+   def CloseWebDriver(self):
+      self.browser.quit()
+
+
+#text_to_be_present_in_element
+
+#EC.element_to_be_clickable((By.CLASS_NAME, "leaflet-clickable")))
+
+
+
+# EC.text_to_be_present_in_element((By.CLASS_NAME, "leaflet-clickable"),"test"))
+
+#EC.text_to_be_present_in_element((By.ID, "operations_monitoring_tab_current_ct_fields_no_data"), "No data to display")
