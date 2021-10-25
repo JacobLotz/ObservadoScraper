@@ -10,4 +10,4 @@ python3 UpdateRanking.py
 
 pango-view --font=mono -qo results.png results.txt --dpi 150
 
-cp results.png ../owncloud/competitie_resultaten/.
+cp results.png ../owncloud/Prive/competitie_resultaten/.
