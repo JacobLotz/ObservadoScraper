@@ -23,11 +23,11 @@ class ScrapeBase:
       self.chrome_options.add_argument("--disable-extensions")
       self.chrome_options.add_argument("--disable-gpu")
       self.chrome_options.add_argument("--no-sandbox") # linux only
-      self.chrome_options.add_argument("--headless")
+      #self.chrome_options.add_argument("--headless")
       #self.chrome_options.page_load_strategy = 'eager'
       
-      self.pathdriver = "/home/jelotz/chromedriver"
-      #self.pathdriver = "/data/localhome/jelotz/Documents/WebDriver/chromedriver"
+      #self.pathdriver = "/home/jelotz/chromedriver"
+      self.pathdriver = "/home/jacob/Documents/prog/ObservadoScraper/chromedriver_linux64/chromedriver"
       
 
 
@@ -36,19 +36,6 @@ class ScrapeBase:
       self.PageSoup = soup(self.browser.page_source, "html.parser")
 
 
-   def GetSoupMig(self):
-      wait_for_element = 10  # wait timeout in seconds
-      self.browser.get(self.Link)
-
-      try:
-        WebDriverWait(self.browser, wait_for_element).until(
-            EC.element_to_be_clickable((By.CLASS_NAME, "leaflet-clickable")))
-      except TimeoutException as e:
-        print("Wait Timed out")
-        print(e)
-
-
-      self.PageSoup = soup(self.browser.page_source, "html.parser")
 
    def PrintSoup(self):
       print(self.PageSoup.prettify)
