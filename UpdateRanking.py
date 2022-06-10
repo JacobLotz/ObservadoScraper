@@ -108,7 +108,7 @@ while rank <= df['Observer'].unique():
 
 
 
-start = "2021-01-01"
+start = "2022-01-01"
 #end = "2021-05-09"
 end = date.today()
 File = open(r"results.txt","w+")

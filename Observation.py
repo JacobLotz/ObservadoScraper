@@ -89,7 +89,7 @@ class Observation(ScrapeBase):
       else:
          self.Description = [k.text for k in details][0]
          if len(details) == 2:
-            self.Description = details[1]
+            self.Description = str(details[1])
 
 
       # Find other data of observation in table
@@ -127,6 +127,10 @@ class Observation(ScrapeBase):
          if "Self" in self.Description:
             return True
          if "self" in self.Description:
+            return True
+         if "qwerty" in self.Description:
+            return True
+         if "Qwerty" in self.Description:
             return True
 
 
