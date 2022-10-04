@@ -4,109 +4,11 @@ from datetime import date
 import pandas as pd
 
 """
-df = pd.DataFrame(columns = ['Observer', 'Name', 'Point', 'Location', 'MonthDay'])
-
-df = df.append({'Observer':'Daan', 'Name': 'Roodhalsgans','Point': 4.0, 'Location' : 'Amsterdam','MonthDay':'01-01-21'}, ignore_index=True)
-
-df = df.append({'Observer':'Jurrien', 'Name': 'Kortsnavelboomkruiper','Point': 4.0, 'Location' : 'Veluwe','MonthDay':'01-03-21'}, ignore_index=True)
-
-df = df.append({'Observer':'Jurrien', 'Name': 'Zeearend','Point': 4.0, 'Location' : 'Rectum','MonthDay':'01-05-21'}, ignore_index=True)
-
-df = df.append({'Observer':'Ruben', 'Name': 'Rode wouw','Point': 0.5, 'Location' : 'Rectum','MonthDay':'01-05-21'}, ignore_index=True)
-
-df = df.append({'Observer':'Jacob', 'Name': 'Europese kanarie','Point': 1.0, 'Location' : 'Rectum','MonthDay':'01-05-21'}, ignore_index=True)
-
-
-
-# Get sum of observer
-print(df.loc[df['Observer'] == "Jurrien"]['Point'].sum())
-
-
-print("\n\n\n")
-# Get observations of observer
-print(df.loc[df['Observer'] == "Jurrien"])
-
-
-print("\n\n\n")
-# Get specific obervation of observer
-print(df.loc[df['Observer'] == "Jurrien"].iloc[0])
-
-# Get column info
-print(df.loc[df['Observer'] == "Jurrien"].iloc[0]['Name'])
-
-print("\n\n\n")
-# Get number of rows
-print(df.shape[0])
-
-# Print dataframe
-print("\n\n\n")
-print(df)
-
-# Print unique observers
-print(df['Observer'].unique())
-
-# Print all data of specific observer
-print("\n\n\n")
-df2 = df.loc[df['Observer'] == "Jurrien"]
-i = 0
-while i < (df2.shape[0]):
-   print('{:<27}{:>6}{:>1}{:<10}{:<60}'.format(
-      df2.iloc[i]['Name'], 
-      df2.iloc[i]['Point'],
-      " " , 
-      df2.iloc[i]['MonthDay'],
-      df2.iloc[i]['Location']
-      ))
-   i+=1
-
-
-# Print all data of all observers // Use File.writelines() to print to file
-print("\n\n\n")
-
-for d in df['Observer'].unique():
-   print(d)
-   df2 = df.loc[df['Observer'] == d]
-   i = 0
-   while i < (df2.shape[0]):
-      print('{:<27}{:>6}{:>1}{:<10}{:<60}'.format(
-         df2.iloc[i]['Name'], 
-         df2.iloc[i]['Point'],
-         " " , 
-         df2.iloc[i]['MonthDay'],
-         df2.iloc[i]['Location']
-         ))
-      i+=1
-   print("")
-
-
-# Create ranking
-print("\n\n\n")
-
-
-maxpoints1 = 0
-rank = 0
-check  = 0
-df2 = df.copy()
-print('Ranking')
-while rank <= df['Observer'].unique():
-   maxpoints1 = 0
-   maxpoints2 = 0
-   for d in df['Observer'].unique():
-      maxpoints2 = df2.loc[df['Observer'] == d]['Point'].sum()
-      if maxpoints2 > maxpoints1:
-         maxpoints1 = maxpoints2
-         maxobserver = d
-   rank += 1
-
-
-   df2.drop(df[df['Observer'] == maxobserver].index, inplace = True)  
-   print('{:<4}{:<15}{:>6}'.format(rank, maxobserver, maxpoints1))
+This script updates the self-found competition by checking the observations of the 
+participating members on the markers "self" or "qwery". If the claim should be awarded
+with points in the competition it will assign the points and print the details. All
+the observations are printed to a file.
 """
-
-
-
-
-
 
 start = "2022-01-01"
 #end = "2021-05-09"
