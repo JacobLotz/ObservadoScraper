@@ -23,11 +23,11 @@ class ScrapeBase:
       self.chrome_options.add_argument("--disable-extensions")
       self.chrome_options.add_argument("--disable-gpu")
       self.chrome_options.add_argument("--no-sandbox") # linux only
-      #self.chrome_options.add_argument("--headless")
+      self.chrome_options.add_argument("--headless")
       #self.chrome_options.page_load_strategy = 'eager'
       
       #self.pathdriver = "/home/jelotz/chromedriver"
-      self.pathdriver = "/home/jacob/Documents/prog/ObservadoScraper/chromedriver_linux64/chromedriver"
+      self.pathdriver = "/home/jelotz/Documents/prog/chromedriver/chromedriver"
       
 
 
