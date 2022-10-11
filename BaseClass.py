@@ -7,9 +7,16 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+ 
+import os
+import sys
 
-
-
+# Get parent directory
+path = os.getcwd()
+# Parent directory
+path = os.path.dirname(path)
+sys.path.insert(0,path)
+from config import *
 
 # Base class containing methods to get soup and set parameters.
 class ScrapeBase:
@@ -26,8 +33,9 @@ class ScrapeBase:
       self.chrome_options.add_argument("--headless")
       #self.chrome_options.page_load_strategy = 'eager'
       
-      #self.pathdriver = "/home/jelotz/chromedriver"
-      self.pathdriver = "/home/jelotz/Documents/prog/chromedriver/chromedriver"
+      # We load the driver path from config.py in the parent directory.
+      self.pathdriver = chromedriverpath + "/chromedriver"
+
       
 
 
