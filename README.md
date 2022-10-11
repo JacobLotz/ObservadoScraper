@@ -5,7 +5,7 @@ Scraper in Python to scrape from observado.org
 This script has been tested for python3.
 
 # Setting the path to the chromedriver
-You have to set the path to the chromedriver in config.py. Example:
+You have to set the path to the chromedriver in config.py in the home folder. Example:
 `chromedriverpath = "/home/user/Documents/prog/chromedriver"`
 
 # Running the code
