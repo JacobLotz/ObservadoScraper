@@ -6,9 +6,7 @@ import json
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-from BaseClass import *
-from Observation import *
-
+from classes import *
 
 # Class inheriting from baseclass which creates a collection of observations and uses 
 # the class Observation to get its data. Class can be constructed by giving a link 
@@ -20,9 +18,9 @@ class ObsCollection(ScrapeBase):
    def LogIn(self):
       url = 'https://waarneming.nl/accounts/login/?next=/'
       self.browser.get(url)
-      user_name = self.browser.find_element_by_name("login")
+      user_name = self.browser.find_element("name","login")
       user_name.send_keys("lotzzzz")
-      password = self.browser.find_element_by_name('password')
+      password = self.browser.find_element("name",'password')
       password.send_keys("jacoblotz")
       password.send_keys(Keys.RETURN)
 
@@ -30,9 +28,9 @@ class ObsCollection(ScrapeBase):
    def LogInOld(self):
       url = 'https://old.waarneming.nl/user/login'
       self.browser.get(url)
-      user_name = self.browser.find_element_by_name("user")
+      user_name = self.browser.find_element("name","user")
       user_name.send_keys("lotzzzz")
-      password = self.browser.find_element_by_name('password')
+      password = self.browser.find_element("name",'password')
       password.send_keys("jacoblotz")
       password.send_keys(Keys.RETURN)
 
@@ -40,7 +38,7 @@ class ObsCollection(ScrapeBase):
    def SetLang(self):
       url = "https://waarneming.nl/generic/select-language-modal/"
       self.browser.get(url)
-      button = self.browser.find_elements_by_name("language")
+      button = self.browser.find_element("name","language")
       button = button[35]
       button.click()
       
@@ -119,7 +117,7 @@ class ObsCollection(ScrapeBase):
    # Method which imports the point for the selffind rankin
    def ImportPoints(self):
       self.Points = {}
-      with open("points.json", "r") as config_file:
+      with open("../data/points.json", "r") as config_file:
          self.Points = json.load(config_file)
       
 

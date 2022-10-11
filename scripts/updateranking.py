@@ -1,7 +1,15 @@
 # Import classes
-from ObsClass import *
 from datetime import date
 import pandas as pd
+import sys
+import os
+ 
+# Get current directory
+path = os.getcwd()
+# Parent directory
+parent = os.path.dirname(path)
+sys.path.insert(0,parent)
+from classes import *
 
 """
 This script updates the self-found competition by checking the observations of the 

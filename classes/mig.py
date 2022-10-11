@@ -9,8 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
 
-from BaseClass import *
-from Observation import *
+from classes import *
 
 class MigClass(ScrapeBase):
    def __init__(self, Link):

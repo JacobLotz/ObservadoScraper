@@ -1,5 +1,5 @@
 import time
-from BaseClass import *
+from classes import *
 
 # Class that is used to get the required data of an observation if its link is given. 
 # Can be called seperately to test on a single observation.

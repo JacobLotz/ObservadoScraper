@@ -27,7 +27,7 @@ class ScrapeBase:
       #self.chrome_options.page_load_strategy = 'eager'
       
       #self.pathdriver = "/home/jelotz/chromedriver"
-      self.pathdriver = "/home/jelotz/Documents/prog/chromedriver/chromedriver"
+      self.pathdriver = "/home/jelotz/prog/chromedriver/chromedriver"
       
 
 
