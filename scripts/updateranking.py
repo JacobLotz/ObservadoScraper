@@ -21,7 +21,8 @@ the observations are printed to a file.
 start = "2022-01-01"
 #end = "2021-05-09"
 end = date.today()
-File = open(r"results.txt","w+")
+filename = parent + "/results.txt"
+File = open(filename,"w+")
 
 # Write headers:
 File.writelines('{:<27}{:<6}{:<1}{:<10}{:<24}{:<20}'.format("Soort", "Punten", " ","Datum", "Locatie", "Laatste update: " + str(end)))

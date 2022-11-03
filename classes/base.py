@@ -10,7 +10,6 @@ from selenium.common.exceptions import TimeoutException
 
 
 
-
 # Base class containing methods to get soup and set parameters.
 class ScrapeBase:
    def __init__(self, Link):

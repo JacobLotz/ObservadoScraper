@@ -7,12 +7,13 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 from classes import *
+from classes import obs
+#from classes import base
 
 # Class inheriting from baseclass which creates a collection of observations and uses 
 # the class Observation to get its data. Class can be constructed by giving a link 
 # and a name.
 class ObsCollection(ScrapeBase):
-
 
    # Log into old website
    def LogIn(self):
@@ -285,7 +286,7 @@ class ObsCollection(ScrapeBase):
          self.LinkObs = iLink
          self.CorrectLinkObs()
 
-         CurObservation = Observation(self.LinkObs, self.browser)
+         CurObservation = obs.Observation(self.LinkObs, self.browser)
          if self.IfOld:
             NoGps = CurObservation.GetDataOld();
          else:
@@ -317,7 +318,7 @@ class ObsCollection(ScrapeBase):
          self.LinkObs = iLink
          self.CorrectLinkObs()
 
-         CurObservation = Observation(self.LinkObs, self.browser)
+         CurObservation = obs.Observation(self.LinkObs, self.browser)
          if self.IfOld:
             NoGps = CurObservation.GetDataOld();
          else:
@@ -380,7 +381,7 @@ class ObsCollection(ScrapeBase):
       self.CreateWebDriver()
       self.LogInOld()
       link = "https://old.waarneming.nl/waarneming/view/207490728" 
-      self.Observation = Observation(link, self.browser)
+      self.Observation = obs.Observation(link, self.browser)
       NoGps = self.Observation.GetDataOld();
       self.UnitCheckObs()
       self.CloseWebDriver()
@@ -390,7 +391,7 @@ class ObsCollection(ScrapeBase):
       self.LogIn()
       self.SetLang()
       link = "https://waarneming.nl/observation/207490728/" 
-      self.Observation = Observation(link, self.browser)
+      self.Observation = obs.Observation(link, self.browser)
       NoGps = self.Observation.GetData();
       self.UnitCheckObs()
       self.CloseWebDriver()
