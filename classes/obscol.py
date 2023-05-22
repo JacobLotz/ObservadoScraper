@@ -22,7 +22,7 @@ class ObsCollection(ScrapeBase):
       user_name = self.browser.find_element("name","login")
       user_name.send_keys("lotzzzz")
       password = self.browser.find_element("name",'password')
-      password.send_keys("jacoblotz")
+      password.send_keys("Lekkerwaarnemen23!")
       password.send_keys(Keys.RETURN)
 
    # Log into new website
@@ -32,7 +32,7 @@ class ObsCollection(ScrapeBase):
       user_name = self.browser.find_element("name","user")
       user_name.send_keys("lotzzzz")
       password = self.browser.find_element("name",'password')
-      password.send_keys("jacoblotz")
+      password.send_keys("Lekkerwaarnemen23!")
       password.send_keys(Keys.RETURN)
 
    # Set language for new website
