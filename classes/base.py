@@ -34,8 +34,6 @@ class ScrapeBase:
       self.browser.get(self.Link)
       self.PageSoup = soup(self.browser.page_source, "html.parser")
 
-
-
    def PrintSoup(self):
       print(self.PageSoup.prettify)
 
