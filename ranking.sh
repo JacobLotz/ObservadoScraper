@@ -6,7 +6,9 @@
 rm results.txt
 rm results.png
 
-python3 UpdateRanking.py
+cd scripts
+python3 updateranking.py
+cd ..
 
 pango-view --font=mono -qo results.png results.txt --dpi 150
 

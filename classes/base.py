@@ -7,16 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
- 
-import os
-import sys
-
-# Get parent directory
-path = os.getcwd()
-# Parent directory
-path = os.path.dirname(path)
-sys.path.insert(0,path)
-from config import *
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Base class containing methods to get soup and set parameters.
 class ScrapeBase:
@@ -32,35 +24,16 @@ class ScrapeBase:
       self.chrome_options.add_argument("--no-sandbox") # linux only
       self.chrome_options.add_argument("--headless")
       #self.chrome_options.page_load_strategy = 'eager'
-      
-      # We load the driver path from config.py in the parent directory.
-      self.pathdriver = chromedriverpath + "/chromedriver"
-
-      
-
 
    def GetSoup(self):
       self.browser.get(self.Link)
       self.PageSoup = soup(self.browser.page_source, "html.parser")
 
-
-
    def PrintSoup(self):
       print(self.PageSoup.prettify)
 
    def CreateWebDriver(self):
-      self.browser = webdriver.Chrome(executable_path = self.pathdriver, chrome_options = self.chrome_options)
+      self.browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
    def CloseWebDriver(self):
       self.browser.quit()
-
-
-#text_to_be_present_in_element
-
-#EC.element_to_be_clickable((By.CLASS_NAME, "leaflet-clickable")))
-
-
-
-# EC.text_to_be_present_in_element((By.CLASS_NAME, "leaflet-clickable"),"test"))
-
-#EC.text_to_be_present_in_element((By.ID, "operations_monitoring_tab_current_ct_fields_no_data"), "No data to display")
