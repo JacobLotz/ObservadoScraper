@@ -33,7 +33,7 @@ class ScrapeBase:
       print(self.PageSoup.prettify)
 
    def CreateWebDriver(self):
-      self.browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+      self.browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()),chrome_options=self.chrome_options)
 
    def CloseWebDriver(self):
       self.browser.quit()
