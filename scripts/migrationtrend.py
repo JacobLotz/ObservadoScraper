@@ -7,6 +7,7 @@ import sys
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from statistics import mean
 
 def GetMonthEnd(date_in_):
 	return calendar.monthrange(date_in_.year, date_in_.month)[1]
@@ -41,6 +42,11 @@ def GetEndDates(month_start_, month_end_, year_):
 	return end_dates
 
 
+def divide_chunks(l, n):
+	# looping till length l
+	for i in range(0, len(l), n): 
+		yield l[i:i + n]
+
 # Get current directory
 path = os.getcwd()
 # Parent directory
@@ -57,25 +63,37 @@ date = start
 delta = datetime.timedelta(days=10)
 
 # Date bins
-year = 2022
+year_start = 2020
+year_end = 2023
+n_years = year_end - year_start + 1
+
+years_range = range(year_start, year_end+1, 1)
+
 
 month_start = 1;
 month_end = 13
 
-bins_start = GetStartDates(month_start, month_end, 2023)
-bins_end   = GetEndDates(month_start, month_end, 2023)
+bins_start = []
+bins_end = []
+
+for year in years_range:
+	bins_start_ = GetStartDates(month_start, month_end, year)
+	bins_end_   = GetEndDates(month_start, month_end, year)
+
+	bins_start.extend(bins_start_)
+	bins_end.extend(bins_end_)
 
 # Data storers
 dates = [];
 squares = [];
 
-link  = "https://old.waarneming.nl/soort/maps/1111?from=" + date.strftime('%Y/%m/%d') + "&to=" + date.strftime('%Y/%m/%d')
+link  = "https://old.waarneming.nl/soort/maps/361?from=" + date.strftime('%Y/%m/%d') + "&to=" + date.strftime('%Y/%m/%d')
 migbclass = MigClass(link)
 migbclass.CreateWebDriver()
 
 
 for (date1, date2) in zip(bins_start, bins_end):
-	link  = "https://old.waarneming.nl/soort/maps/1111?from=" + date1.strftime('%Y/%m/%d') + "&to=" + date2.strftime('%Y/%m/%d')
+	link  = "https://old.waarneming.nl/soort/maps/361?from=" + date1.strftime('%Y/%m/%d') + "&to=" + date2.strftime('%Y/%m/%d')
 	migbclass.UpdateLink(link)
 	migbclass.GetSoupMig()
 
@@ -87,32 +105,29 @@ for (date1, date2) in zip(bins_start, bins_end):
 	print(str(date1) + ", " + str(n) + " squares")
 
 
-
-
-y1 = squares[0::3]
-y2 = squares[1::3]
-y3 = squares[2::3]
-
-x_axis = [ "Jan", "Feb", "Maa", "Apr", "Mei", "Jun",
-           "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+# Plot
+x_axis = [ "Jan", " ", " ", "Feb", " ", " ", "Maa", " ", " ", "Apr", " ", " ", "Mei", " ", " ", "Jun", " ", " ",
+           "Jul", " ", " ", "Aug", " ", " ", "Sep", " ", " ", "Okt", " ", " ", "Nov", " ", " ", "Dec", " ", " ",]
 X_axis = np.arange(len(x_axis))
 
-# Plot
+y = squares
+yy = list(divide_chunks(y, len(x_axis)))
+
+#print(*map(mean, zip(*yy)))
+
+#yy_mean = map(mean, zip(*yy))
+yy_mean = np.mean(np.array(yy), axis=0).tolist()
+print(yy_mean)
+
 plt.figure(figsize=(8,3))
-plt.bar(X_axis - 0.2, y1, 0.2, label = ' 1-10')
-plt.bar(X_axis + 0.0, y2, 0.2, label = '11-20')
-plt.bar(X_axis + 0.2, y3, 0.2, label = '21-31')
-#plt.axvline(x=xm1, linewidth=1.0, color='#d62728')
-#plt.axvline(x=xm2, linewidth=1.0, color='#d62728')
+for (yyy, year) in zip(yy,years_range):
+	plt.plot(X_axis, yyy, label = str(year),  alpha=0.5, linestyle='dashed')
+plt.plot(X_axis, yy_mean, color="black", label = "average")
 plt.xticks(X_axis, x_axis)
-#plt.yticks(Y_axis)
 #plt.title(title)
 plt.legend()
 #plt.savefig(file_name)
 plt.show()
-
-
-
 
 
 

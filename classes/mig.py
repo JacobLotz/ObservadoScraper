@@ -20,7 +20,7 @@ class MigClass(ScrapeBase):
       self.Link = Link;
 
    def GetSoupMig(self):
-      wait_for_element = 10  # wait timeout in seconds
+      wait_for_element = 1  # wait timeout in seconds
       self.browser.get(self.Link)
 
       try:
