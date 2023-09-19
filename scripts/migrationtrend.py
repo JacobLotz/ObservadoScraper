@@ -9,6 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from statistics import mean
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from matplotlib.ticker import FixedLocator
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 # Get current directory
 path = os.getcwd()
@@ -95,9 +97,10 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 		print(str(date1) + ", " + str(n) + " squares")
 
 
-	# Plot
+	# Labels
 	x_axis = [ "Jan", " ", " ", "Feb", " ", " ", "Maa", " ", " ", "Apr", " ", " ", "Mei", " ", " ", "Jun", " ", " ",
 	           "Jul", " ", " ", "Aug", " ", " ", "Sep", " ", " ", "Okt", " ", " ", "Nov", " ", " ", "Dec", " ", " ",]
+
 	X_axis = np.arange(len(x_axis))
 
 	x_axis = x_axis[(month_start - 1)*3:(month_end*3)]
@@ -106,26 +109,37 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 	y = squares
 	yy = list(divide_chunks(y, len(x_axis)))
 
-	# Do not include last year in average
+	# Compute mean, but do not include last year in average
 	if len(yy)>0:
 		yy_premean = yy[0:-1]
 
-
 	yy_mean = np.mean(np.array(yy_premean), axis=0).tolist()
 
+	# Axis locators
+	majorLocator   = MultipleLocator(3)
+	minorLocator   = MultipleLocator(1)
+
+	# Plot
 	plt.figure(figsize=(8,3))
 	for (yyy, year) in zip(yy,years_range):
 		plt.plot(X_axis, yyy, label = str(year),  alpha=0.5, linestyle='dashed')
 	plt.plot(X_axis, yy_mean, color="black", label = "gem.")
-	plt.xticks(X_axis, x_axis)
+
 	plt.gca().set_ylim(bottom=0)
+	plt.gca().set_xlim(left=0, right=len(x_axis)-1)
+
+	plt.xticks(X_axis, x_axis)
+	plt.gca().xaxis.set_major_locator(majorLocator)
+	plt.gca().xaxis.set_minor_locator(minorLocator)
+
 	plt.title(name)
 	plt.legend()
 	plt.savefig(str(speciesid) + "-" + name)
 	plt.close()
 	#plt.show()
 
-#GetSpeciesPlot(2021,2022, 9, 12, 781, "Zwarte Rotgans")
+
+#GetSpeciesPlot(2021,2022, 10, 12, 781, "Zwarte Rotgans")
 
 GetSpeciesPlot(2018,2023, 1, 12, 781,   "Zwarte Rotgans")
 GetSpeciesPlot(2018,2023, 1, 12, 769,   "Witbuikrotgans")
