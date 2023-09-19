@@ -122,11 +122,11 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 	# Plot
 	plt.figure(figsize=(8,3))
 	for (yyy, year) in zip(yy,years_range):
-		plt.plot(X_axis, yyy, label = str(year),  alpha=0.5, linestyle='dashed')
-	plt.plot(X_axis, yy_mean, color="black", label = "gem.")
+		plt.plot(X_axis + 0.5, yyy, label = str(year),  alpha=0.5, linestyle='dashed')
+	plt.plot(X_axis + 0.5, yy_mean, color="black", label = "gem.")
 
 	plt.gca().set_ylim(bottom=0)
-	plt.gca().set_xlim(left=0, right=len(x_axis)-1)
+	plt.gca().set_xlim(left=0, right=len(x_axis))
 
 	plt.xticks(X_axis, x_axis)
 	plt.gca().xaxis.set_major_locator(majorLocator)
@@ -139,7 +139,7 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 	#plt.show()
 
 
-#GetSpeciesPlot(2021,2022, 10, 12, 781, "Zwarte Rotgans")
+#GetSpeciesPlot(2021,2022, 1, 12, 781, "Zwarte Rotgans")
 
 GetSpeciesPlot(2018,2023, 1, 12, 781,   "Zwarte Rotgans")
 GetSpeciesPlot(2018,2023, 1, 12, 769,   "Witbuikrotgans")
