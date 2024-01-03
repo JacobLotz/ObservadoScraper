@@ -10,6 +10,11 @@ from classes import *
 from classes import obs
 #from classes import base
 
+# import password from external file
+import sys
+sys.path.append('../')
+from password import username_in, password_in
+
 # Class inheriting from baseclass which creates a collection of observations and uses 
 # the class Observation to get its data. Class can be constructed by giving a link 
 # and a name.
@@ -20,9 +25,9 @@ class ObsCollection(ScrapeBase):
       url = 'https://waarneming.nl/accounts/login/?next=/'
       self.browser.get(url)
       user_name = self.browser.find_element("name","login")
-      user_name.send_keys("lotzzzz")
+      user_name.send_keys(username_in)
       password = self.browser.find_element("name",'password')
-      password.send_keys("Lekkerwaarnemen23!")
+      password.send_keys(password_in)
       password.send_keys(Keys.RETURN)
 
    # Log into new website
@@ -30,9 +35,9 @@ class ObsCollection(ScrapeBase):
       url = 'https://old.waarneming.nl/user/login'
       self.browser.get(url)
       user_name = self.browser.find_element("name","user")
-      user_name.send_keys("lotzzzz")
+      user_name.send_keys(username_in)
       password = self.browser.find_element("name",'password')
-      password.send_keys("Lekkerwaarnemen23!")
+      password.send_keys(password_in)
       password.send_keys(Keys.RETURN)
 
    # Set language for new website
