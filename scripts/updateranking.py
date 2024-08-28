@@ -18,9 +18,9 @@ with points in the competition it will assign the points and print the details. 
 the observations are printed to a file.
 """
 
-start = "2023-01-01"
-#end = "2021-05-09"
+start = "2024-01-01"
 end = date.today()
+
 filename = parent + "/results.txt"
 File = open(filename,"w+")
 
