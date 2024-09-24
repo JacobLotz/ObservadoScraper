@@ -22,7 +22,7 @@ class ScrapeBase:
       self.chrome_options.add_argument("--disable-extensions")
       self.chrome_options.add_argument("--disable-gpu")
       self.chrome_options.add_argument("--no-sandbox") # linux only
-      self.chrome_options.add_argument("--headless")
+      #self.chrome_options.add_argument("--headless")
       #self.chrome_options.page_load_strategy = 'eager'
 
    def GetSoup(self):

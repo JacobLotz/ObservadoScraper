@@ -51,8 +51,7 @@ class Observation(ScrapeBase):
       # Find description
       self.Description = self.PageSoup.find("div", {"class": "goog-trans-section"})
       if self.Description:
-         if self.Description.find("p"):
-            self.Description = self.Description.find("p").contents[0]
+         self.Description = self.Description.get_text()
 
       return False
 
@@ -66,6 +65,7 @@ class Observation(ScrapeBase):
       # Find name of species
       self.Name = header.split(" - ")[0]  # Find name of observation
 
+      gps = ""
       scripts = self.PageSoup.head.find_all("script")
       for i in range(0, len(scripts)):
          if "lon" in str(scripts[i]):
