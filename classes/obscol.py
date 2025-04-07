@@ -21,21 +21,19 @@ from password import username_in, password_in
 # and a name.
 class ObsCollection(ScrapeBase):
 
+   def __init__(self, Link):
+      super().__init__(Link)
+      self.Name = "out.kml"
+    # body of the constructor
+
+   def SetName(self, kmlname):
+      self.Name = kmlname
+
    # Log into old website
    def LogIn(self):
       url = 'https://waarneming.nl/accounts/login/?next=/'
       self.browser.get(url)
       user_name = self.browser.find_element("name","login")
-      user_name.send_keys(username_in)
-      password = self.browser.find_element("name",'password')
-      password.send_keys(password_in)
-      password.send_keys(Keys.RETURN)
-
-   # Log into new website
-   def LogInOld(self):
-      url = 'https://old.waarneming.nl/user/login'
-      self.browser.get(url)
-      user_name = self.browser.find_element("name","user")
       user_name.send_keys(username_in)
       password = self.browser.find_element("name",'password')
       password.send_keys(password_in)
@@ -56,40 +54,19 @@ class ObsCollection(ScrapeBase):
       print('\n-------------------------------------')
       print('Starting to scrape new datacollection')
 
-      # Check if old website or new website, this scraper can handle both
-      if "old.waarneming" in self.Link:
-         self.IfOld = True
-      else:
-         self.IfOld = False
+      # Get links to relevant observations
+      self.CreateWebDriver()
+      self.SetLang()
+      self.GetObservations();
 
-      if self.IfOld:
-         # Get links to relevant observations
-         self.CreateWebDriver()
-         self.GetObservationsOld();
-         
-         # If all links are collected create kml and scrape the pages for the data
-         print('Starting extraction of data of observations')
-         
-         self.CreateKML()
-         self.ScrapePages()
-         self.SaveKML()
-         self.CloseWebDriver()
-         print("Saved as: " + self.Name)
+      # If all links are collected create kml and scrape the pages for the data
+      print('Starting extraction of data of observations')
 
-      else:   
-         # Get links to relevant observations
-         self.CreateWebDriver()
-         self.SetLang()
-         self.GetObservations();
-
-         # If all links are collected create kml and scrape the pages for the data
-         print('Starting extraction of data of observations')
-
-         self.CreateKML()
-         self.ScrapePages()
-         self.SaveKML()
-         self.CloseWebDriver()
-         print("Saved as: " + self.Name)
+      self.CreateKML()
+      self.ScrapePages()
+      self.SaveKML()
+      self.CloseWebDriver()
+      print("Saved as: " + self.Name)
 
 
 
@@ -98,28 +75,14 @@ class ObsCollection(ScrapeBase):
       print('\n-------------------------------------')
       print('Starting to update the selffind ranking')
 
-      # Check if old website or new website, this scraper can handle both
-      if "old.waarneming" in str(self.Link):
-         self.IfOld = True
-      else:
-         self.IfOld = False
-
       # Get links to relevant observations --> Filter should be here
-      if self.IfOld:
-         self.ImportPoints()
-         self.CreateWebDriver()
-         #self.LogInOld()
-         self.GetObservationsSelfOld()
-         self.FindSelfFinds()
-         self.CloseWebDriver()
-      else:
-         self.ImportPoints()
-         self.CreateWebDriver()
-         #self.LogIn()
-         self.SetLang()
-         self.GetObservationsSelf()
-         self.FindSelfFinds()
-         self.CloseWebDriver()
+      self.ImportPoints()
+      self.CreateWebDriver()
+      #self.LogIn()
+      self.SetLang()
+      self.GetObservationsSelf()
+      self.FindSelfFinds()
+      self.CloseWebDriver()
 
    # Method which imports the point for the selffind rankin
    def ImportPoints(self):
@@ -213,116 +176,6 @@ class ObsCollection(ScrapeBase):
             print('Currently in page ' + str(Page)) 
             print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
 
-
-   # Method for collecting all the observations from all pages from the given link for OLD website
-   # This method should be called before ScrapePages() 
-   def GetObservationsOld(self):
-      self.Obs = [];
-
-      # Create variable link such that it is able to go through multiple pages
-      BaseLink = self.Link[0:-1]
-      Page = 0
-
-      print('Starting to retrieve links from overview pages')
-
-      # Find last page
-      self.GetSoup()
-      lastpage = int(str(self.PageSoup.find("td", colspan = True)).split(" | ")[1].split(" ")[0])
-
-      # Get links from page to observations
-      IfEnd = False
-      while IfEnd is not True:
-         time.sleep(self.Wait)
-         Page +=1
-
-         print('Currently in page %d\r'%Page, end="")
-         self.Link = BaseLink + str(Page)
-         self.GetSoup()
-
-         for link in self.PageSoup.findAll('a', attrs={'href': re.compile("^/waarneming/view/")}):
-            self.Obs.append(link.get('href'))
-
-         if Page == lastpage:
-            IfEnd = True
-            print('Currently in page ' + str(Page))
-
-            # Remove duplicates
-            TempObs = []
-            for i in self.Obs:
-               if i not in TempObs:
-                  TempObs.append(i)
-            self.Obs = TempObs
-            print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
-   
-
-   # Method for collecting all the observations from all pages from the given link for OLD website
-   # This method should be called before ScrapePages() ONLY SAVING POTENTIAL SELFFINDS
-   
-
-   def GetObservationsSelfOld(self):
-      self.Obs = [];
-
-      # Create variable link such that it is able to go through multiple pages
-      BaseLink = self.Link[0:-1]
-      Page = 0
-
-      print('Starting to retrieve links from overview pages')
-
-      # Find last page
-      self.GetSoup()
-      lastpage = int(str(self.PageSoup.find("td", colspan = True)).split(" | ")[1].split(" ")[0])
-
-
-      # Get links from page to observations
-      IfEnd = False
-      
-      while IfEnd is not True:
-         Page +=1
-         time.sleep(self.Wait)
-         print('Currently in page %d\r'%Page, end="")
-         self.Link = BaseLink + str(Page)
-         self.GetSoup()
-
-         links = self.PageSoup.findAll('a', attrs={'href': re.compile("^/waarneming/view/")})
-         species = self.PageSoup.findAll("span",{"class": ["z2", "z3", "z4"]})
-         testlinks = []
-         potentialselfobs = []
-         
-         i = 0
-         for sp in species:
-            testspecies = sp.get_text().split(" - ")[0]
-            if testspecies in self.Points:
-               potentialselfobs.append(i)
-            i+=1
-
-         for link in links:
-            testlinks.append(link.get('href'))
-
-         # Remove duplicates
-         TempObs = []
-         for i in range(0,len(testlinks),2):
-            TempObs.append(testlinks[i])
-         testlinks = TempObs
-
-        
-         # Get potential links
-         for i in potentialselfobs:
-            self.Obs.append(testlinks[i])
-
-         if Page == lastpage:
-            IfEnd = True
-            print('Currently in page ' + str(Page))
-            print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
-
-
-      
-      
-      
-
-
-
-
-
    # Method to scrape the collected links to observations from GetObservations(). This
    # method can only be called after GetObservations()
    def ScrapePages(self):
@@ -342,17 +195,12 @@ class ObsCollection(ScrapeBase):
          self.CorrectLinkObs()
 
          CurObservation = obs.Observation(self.LinkObs, self.browser)
-         if self.IfOld:
-            NoGps = CurObservation.GetDataOld();
-         else:
-            NoGps = CurObservation.GetData();
+         NoGps = CurObservation.GetData();
          
          
          # Skip if no gpsdata
          if NoGps is False:
             CurObservation.WriteKMLLine(self.Kml)
-
-
 
    # Method which finds all selffind observations and writes to file after initalisation
    def FindSelfFinds(self):
@@ -374,10 +222,7 @@ class ObsCollection(ScrapeBase):
          self.CorrectLinkObs()
 
          CurObservation = obs.Observation(self.LinkObs, self.browser)
-         if self.IfOld:
-            NoGps = CurObservation.GetDataOld();
-         else:
-            NoGps = CurObservation.GetData();
+         NoGps = CurObservation.GetData();
 
          # Check if selffind
          if NoGps is False:
@@ -390,17 +235,10 @@ class ObsCollection(ScrapeBase):
       self.File.writelines('\n')
       self.File.writelines('{:<27}{:>6}'.format("Totaal: ",  PointsTotal))
 
-
-
-
    # Method to modify a link to an observation such that is is an actual weblink. Not
    # an internal link of waarneming.nl.
    def CorrectLinkObs(self):
-      if self.IfOld:
-         self.LinkObs = 'https://old.waarneming.nl'+self.LinkObs
-
-      else:
-         self.LinkObs = 'https://waarneming.nl'+self.LinkObs
+      self.LinkObs = 'https://waarneming.nl'+self.LinkObs
          
 
 
@@ -410,7 +248,7 @@ class ObsCollection(ScrapeBase):
 
    # Saves the created .kml file to self.Name.
    def SaveKML(self):
-      self.Kml.save("out.kml", format=True)
+      self.Kml.save(self.Name, format=True)
 
    def SetOutputFile(self, File):
       self.File = File
