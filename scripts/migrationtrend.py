@@ -87,7 +87,7 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 
 	for (date1, date2) in zip(bins_start, bins_end):
 		link = "https://waarneming.nl/species/"+str(speciesid)+"/maps/?start_date=" + date1.strftime('%Y-%m-%d') + "&end_date=" + date2.strftime('%Y-%m-%d')+"&map_type=grid1k"
-		print(link)
+
 		migbclass.UpdateLink(link)
 		migbclass.GetSoupMig()
 
