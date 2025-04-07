@@ -62,6 +62,7 @@ def divide_chunks(l, n):
 def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name):
 
 
+	print("Working on :" + name)
 	# Date bins
 	n_years = year_end - year_start + 1
 	years_range = range(year_start, year_end+1, 1)
