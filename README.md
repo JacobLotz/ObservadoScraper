@@ -1,5 +1,5 @@
 # ObservadoScraper
-Scraper in Python to scrape from observado.org
+Scraper in Python to scrape from observado.org showing migration trends, competition rankings and species observations oberviews.
 
 # Version
 This script has been tested for python3.

@@ -16,18 +16,19 @@ class MigClass(ScrapeBase):
       self.Link = Link;
       self.SetParam()
 
+   def UpdateLink(self, Link):
+      self.Link = Link;
 
    def GetSoupMig(self):
-      wait_for_element = 3  # wait timeout in seconds
+      wait_for_element = 1  # wait timeout in seconds
       self.browser.get(self.Link)
 
       try:
         WebDriverWait(self.browser, wait_for_element).until(
             EC.element_to_be_clickable((By.CLASS_NAME, "leaflet-clickable")))
       except TimeoutException as e:
-        print("Wait Timed out")
-        print(e)
-
+        print("Wait Timed out, probably no observations")
+        #print(e)
 
       self.PageSoup = soup(self.browser.page_source, "html.parser")
 
