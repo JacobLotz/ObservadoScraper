@@ -1,15 +1,8 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup as soup
-import time
-
 import re
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-
 
 from classes import *
 
@@ -24,7 +17,7 @@ class MigClass(ScrapeBase):
    def GetSoupMig(self):
       wait_for_element = 1  # wait timeout in seconds
       self.browser.get(self.Link)
-      wait = WebDriverWait(self.browser, 10)
+      wait = WebDriverWait(self.browser, 4)
       try:
          wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".leaflet-tile-loaded")))
 

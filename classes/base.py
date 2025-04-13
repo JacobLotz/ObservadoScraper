@@ -1,14 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from bs4 import BeautifulSoup as soup
-import time
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup as soup
 
 # Base class containing methods to get soup and set parameters.
 class ScrapeBase:
@@ -23,7 +17,6 @@ class ScrapeBase:
       self.chrome_options.add_argument("--disable-gpu")
       self.chrome_options.add_argument("--no-sandbox") # linux only
       #self.chrome_options.add_argument("--headless")
-      #self.chrome_options.page_load_strategy = 'eager'
 
    def GetSoup(self):
       self.browser.get(self.Link)

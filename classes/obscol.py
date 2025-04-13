@@ -1,15 +1,10 @@
-from bs4 import BeautifulSoup as soup
 import re
 import simplekml
 import time
 import json
-from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.select import Select
 
 from classes import *
-from classes import obs
-#from classes import base
 
 # import password from external file
 import sys
@@ -26,8 +21,10 @@ class ObsCollection(ScrapeBase):
       self.Name = "out.kml"
     # body of the constructor
 
+
    def SetName(self, kmlname):
       self.Name = kmlname
+
 
    # Log into old website
    def LogIn(self):
@@ -39,6 +36,7 @@ class ObsCollection(ScrapeBase):
       password.send_keys(password_in)
       password.send_keys(Keys.RETURN)
 
+
    # Set language for new website
    def SetLang(self):
       url = "https://waarneming.nl/generic/select-language-modal/"
@@ -46,8 +44,7 @@ class ObsCollection(ScrapeBase):
 
       button = self.browser.find_element("xpath", "//button[@value='nl']")
       button.click()
-      
-      
+
 
    # Method for performing the whole scraping process after initialization for new website
    def StartScrapingProcess(self):
@@ -69,7 +66,6 @@ class ObsCollection(ScrapeBase):
       print("Saved as: " + self.Name)
 
 
-
    # Method for performing the whole scraping process after initialization for old website
    def StartUpdateSelffindRanking(self):
       print('\n-------------------------------------')
@@ -83,6 +79,7 @@ class ObsCollection(ScrapeBase):
       self.GetObservationsSelf()
       self.FindSelfFinds()
       self.CloseWebDriver()
+
 
    # Method which imports the point for the selffind rankin
    def ImportPoints(self):
@@ -124,7 +121,6 @@ class ObsCollection(ScrapeBase):
             IfEnd = True
             print('Currently in page ' + str(Page)) 
             print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
-
 
 
    # Method for collecting all the observations from all pages from the given link for new website
@@ -176,6 +172,7 @@ class ObsCollection(ScrapeBase):
             print('Currently in page ' + str(Page)) 
             print("Found " + str(Page) + " pages of observations having a total of " + str(len(self.Obs)) + " observations.\n")
 
+
    # Method to scrape the collected links to observations from GetObservations(). This
    # method can only be called after GetObservations()
    def ScrapePages(self):
@@ -201,6 +198,7 @@ class ObsCollection(ScrapeBase):
          # Skip if no gpsdata
          if NoGps is False:
             CurObservation.WriteKMLLine(self.Kml)
+
 
    # Method which finds all selffind observations and writes to file after initalisation
    def FindSelfFinds(self):
@@ -241,7 +239,6 @@ class ObsCollection(ScrapeBase):
       self.LinkObs = 'https://waarneming.nl'+self.LinkObs
          
 
-
    # Create .kml file to save observations to.
    def CreateKML(self):
       self.Kml=simplekml.Kml()
@@ -267,19 +264,7 @@ class ObsCollection(ScrapeBase):
          print(self.Observation.Longitude)
 
 
-
-
-
    def UnitChecks(self):
-      # Old Website
-      self.CreateWebDriver()
-      self.LogInOld()
-      link = "https://old.waarneming.nl/waarneming/view/207490728" 
-      self.Observation = obs.Observation(link, self.browser)
-      NoGps = self.Observation.GetDataOld();
-      self.UnitCheckObs()
-      self.CloseWebDriver()
-
       # New website
       self.CreateWebDriver()
       self.LogIn()
@@ -288,16 +273,6 @@ class ObsCollection(ScrapeBase):
       self.Observation = obs.Observation(link, self.browser)
       NoGps = self.Observation.GetData();
       self.UnitCheckObs()
-      self.CloseWebDriver()
-
-      # GetObservations old website
-      self.CreateWebDriver()
-      self.LogInOld()
-      self.Link = "https://old.waarneming.nl/user/view/41541?q=&akt=0&g=0&from=2021-01-01&to=2021-01-06&prov=0&z=0&sp=0&gb=0&method=0&cdna=0&f=0&m=K&zeker=O&month=0&rows=20&only_hidden=0&zoektext=0&tag=0&plum=0&page=1"
-      self.GetObservationsOld()
-      if len(self.Obs) != 56:
-         print("Error in GetObservationsOld")
-         print(len(self.Obs))
       self.CloseWebDriver()
 
       # GetObservations new website
@@ -310,10 +285,3 @@ class ObsCollection(ScrapeBase):
          print(len(self.Obs))
       self.CloseWebDriver()
       
-
-
-
-
-
-
-

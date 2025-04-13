@@ -1,6 +1,3 @@
-#from BaseClass import *
-#from MigClass import *
-#import time
 import datetime
 from datetime import datetime as dt
 import calendar
@@ -8,10 +5,7 @@ import sys
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from statistics import mean
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
-from matplotlib.ticker import FixedLocator
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+from matplotlib.ticker import (MultipleLocator)
 
 # Get current directory
 path = os.getcwd()
@@ -23,6 +17,7 @@ from classes import *
 
 def GetMonthEnd(date_in_):
 	return calendar.monthrange(date_in_.year, date_in_.month)[1]
+
 
 def GetStartDates(month_start_, month_end_, year_):
 	start_dates = []
@@ -39,6 +34,7 @@ def GetStartDates(month_start_, month_end_, year_):
 		month += 1;
 	return start_dates
 
+
 def GetEndDates(month_start_, month_end_, year_):
 	end_dates = []
 	month = month_start_
@@ -54,15 +50,15 @@ def GetEndDates(month_start_, month_end_, year_):
 	return end_dates
 
 
-def divide_chunks(l, n):
+def DivideChunks(l, n):
 	# looping till length l
 	for i in range(0, len(l), n): 
 		yield l[i:i + n]
 
+
 def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name):
+	print("Working on: " + name)
 
-
-	print("Working on :" + name)
 	# Date bins
 	n_years = year_end - year_start + 1
 	years_range = range(year_start, year_end+1, 1)
@@ -99,7 +95,6 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 
 		print(str(date1) + ", " + str(n) + " squares")
 
-
 	# Labels
 	x_axis = [ "Jan", " ", " ", "Feb", " ", " ", "Maa", " ", " ", "Apr", " ", " ", "Mei", " ", " ", "Jun", " ", " ",
 	           "Jul", " ", " ", "Aug", " ", " ", "Sep", " ", " ", "Okt", " ", " ", "Nov", " ", " ", "Dec", " ", " ",]
@@ -110,7 +105,7 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 	X_axis = np.arange(len(x_axis))
 
 	y = squares
-	yy = list(divide_chunks(y, len(x_axis)))
+	yy = list(DivideChunks(y, len(x_axis)))
 
 	# Compute mean, but do not include last year in average
 	if len(yy)>0:
@@ -139,10 +134,9 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 	plt.legend()
 	plt.savefig(str(speciesid) + "-" + name)
 	plt.close()
-	#plt.show()
 
 
-#GetSpeciesPlot(2021,2022, 1, 12, 781, "Zwarte Rotgans")
+GetSpeciesPlot(2021,2022, 1, 12, 781, "Zwarte Rotgans")
 end_year = dt.now().year-1
 start_year = end_year -5
 
