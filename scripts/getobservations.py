@@ -1,12 +1,4 @@
 # Import classes
-import sys
-import os
-
-# Get current directory
-path = os.getcwd()
-# Parent directory
-parent = os.path.dirname(path)
-sys.path.insert(0,parent)
 from classes import *
 
 

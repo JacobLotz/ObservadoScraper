@@ -7,11 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (MultipleLocator)
 
-# Get current directory
-path = os.getcwd()
-# Parent directory
-parent = os.path.dirname(path)
-sys.path.insert(0,parent)
 from classes import *
 
 
@@ -136,7 +131,6 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 	plt.close()
 
 
-GetSpeciesPlot(2021,2022, 1, 12, 781, "Zwarte Rotgans")
 end_year = dt.now().year-1
 start_year = end_year -5
 
@@ -158,17 +152,17 @@ start_year = end_year -5
 #GetSpeciesPlot(start_year,end_year, 1, 12, 905, 	"Breedbekstrandloper")
 #GetSpeciesPlot(start_year,end_year, 1, 12, 370, 	"Gestreepte strandloper")
 #GetSpeciesPlot(start_year,end_year, 1, 12, 253, 	"Grauwe franjepoot")
-GetSpeciesPlot(start_year,end_year, 1, 12, 318, 	"Rosse franjepoot")
-GetSpeciesPlot(start_year,end_year, 1, 12, 307, 	"Poelruiter")
-GetSpeciesPlot(start_year,end_year, 1, 12, 1387,  "Vorkstaartmeeuw")
-GetSpeciesPlot(start_year,end_year, 1, 12, 255,   "Grote burgemeester")
-GetSpeciesPlot(start_year,end_year, 1, 12, 272,   "Kleine burgemeester")
-GetSpeciesPlot(start_year,end_year, 1, 12, 368,   "Lachstern")
-GetSpeciesPlot(start_year,end_year, 1, 12, 762,   "Witwangstern")
-GetSpeciesPlot(start_year,end_year, 1, 12, 361,   "Witvleugelstern")
-GetSpeciesPlot(start_year,end_year, 1, 12, 278,   "Kleinste Jager")
-GetSpeciesPlot(start_year,end_year, 1, 12, 270,   "Kleine alk")
-GetSpeciesPlot(start_year,end_year, 1, 12, 1538,  "Zwarte zeekoet")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 318, 	"Rosse franjepoot")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 307, 	"Poelruiter")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 1387,  "Vorkstaartmeeuw")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 255,   "Grote burgemeester")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 272,   "Kleine burgemeester")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 368,   "Lachstern")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 762,   "Witwangstern")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 361,   "Witvleugelstern")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 278,   "Kleinste Jager")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 270,   "Kleine alk")
+#GetSpeciesPlot(start_year,end_year, 1, 12, 1538,  "Zwarte zeekoet")
 GetSpeciesPlot(start_year,end_year, 1, 12, 304,   "Papegaaiduiker")
 GetSpeciesPlot(start_year,end_year, 1, 12, 263,   "Ijsduiker")
 GetSpeciesPlot(start_year,end_year, 1, 12, 335,   "Stormvogeltje")

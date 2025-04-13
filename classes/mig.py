@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from classes import *
+from .base import ScrapeBase
 
 class MigClass(ScrapeBase):
    def __init__(self, Link):
