@@ -1,0 +1,17 @@
+# Load with: 
+#    conda env create -f environment.yml
+# Activate with: 
+#    conda activate observadoscraper
+
+name: observadoscraper
+dependencies:
+  - python
+  - numpy
+  - pandas
+  - matplotlib
+  - bs4
+  - selenium
+  - pip
+  - pip:
+    - simplekml
+    - webdriver_manager

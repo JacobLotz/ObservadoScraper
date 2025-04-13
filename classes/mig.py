@@ -35,7 +35,7 @@ class MigClass(ScrapeBase):
 
       self.PageSoup = soup(self.browser.page_source, "html.parser")
 
-   def GetNSquares(self):   
+   def GetNSquares(self):
       element = self.browser.find_element("css selector", ".panel-body.map-legend")
       text = element.text
       
