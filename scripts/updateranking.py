@@ -33,7 +33,6 @@ collection.StartUpdateSelffindRanking()
 File.writelines('\n\n----------------------------------------------------------------------------------------------')
 File.writelines('\nRuben\n')
 link = "https://waarneming.nl/users/3219/observations/?date_after="+ str(start) +"&date_before="+ str(end) + "&species_group=1&rarity=2&page=1"
-print(link)
 collection = ObsCollection(link)
 collection.SetOutputFile(File)
 collection.StartUpdateSelffindRanking()
