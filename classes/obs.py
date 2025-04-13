@@ -1,4 +1,3 @@
-import time
 from classes import *
 
 # Class that is used to get the required data of an observation if its link is given. 
@@ -36,8 +35,6 @@ class Observation(ScrapeBase):
       # Get location
       self.Location = info[4].text.strip()
 
-
-
       # Location: skip if obscured
       location = self.PageSoup.find_all("span",{"class": "teramap-coordinates-coords"})
       if location:
@@ -61,6 +58,7 @@ class Observation(ScrapeBase):
    def WriteKMLLine(self, Kml):
       Kml.newpoint(name = self.Name, coords = [(self.Longitude,self.Latitude)], description='Date: ' + self.DateTime)
 
+
    # Method which checks if the observation is a selffind.
    def CheckSelffind(self):
       if self.Description:
@@ -77,6 +75,7 @@ class Observation(ScrapeBase):
    def WriteOutputLine(self, File):
       File.writelines('{:<27}{:>6}{:>1}{:<10}{:<60}'.format(self.Name, self.Point," " ,self.MonthDay, self.Location))
       File.writelines('\n')
+
 
    def AssignPoints(self, Points):
       self.Point = Points[self.Name]
