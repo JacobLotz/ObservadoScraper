@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # Ignore password file
-password.py
+passwords.py
 
 # Scrape results
 *.kml
