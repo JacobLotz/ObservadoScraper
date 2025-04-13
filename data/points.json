@@ -106,9 +106,10 @@
    "Dwergarend"                 :25.0,
    "Dougalls Stern"             :22.0,
    "Scharrelaar"                :35.0,
-   "Klein Waterhoen"            :19.0,
-   "Rode Wouw"                  :0.5,
-   "Zwarte Wouw"                :0.5,
-   "Visarend"                   :0.5,
-   "Kraanvogel"                 :0.5
+   "Koningseider"               :45.0,
+   "Kraanvogel"                 : 0.5,
+   "Rode Wouw"                  : 0.5,
+   "Zwarte Wouw"                : 0.5,
+   "Visarend"                   : 0.5,
+   "Kraanvogel"                 : 0.5
 }
