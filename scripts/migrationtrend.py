@@ -7,11 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (MultipleLocator)
 
-# Get current directory
-path = os.getcwd()
-# Parent directory
-parent = os.path.dirname(path)
-sys.path.insert(0,parent)
 from classes import *
 
 
@@ -132,32 +127,32 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, speciesid, name
 
 	plt.title(name)
 	plt.legend()
-	plt.savefig(str(speciesid) + "-" + name)
+	plt.savefig(str(speciesid) + "-" + name.replace(" ", "_"))
 	plt.close()
 
 
-GetSpeciesPlot(2021,2022, 1, 12, 781, "Zwarte Rotgans")
 end_year = dt.now().year-1
 start_year = end_year -5
 
-#GetSpeciesPlot(start_year,end_year, 1, 12, 781,   "Zwarte Rotgans")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 769,   "Witbuikrotgans")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 313,   "Roodhalsgans")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 327,   "Sneeuwgans")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 338,   "Taigarietgans")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 244,   "Dwerggans")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 772,   "Witoogeend")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 264,   "Ijseend")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 216,   "Alpengierzwaluw")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 18,    "Kwartelkoning")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 17,    "Porseleinhoen")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 19,    "Kraanvogel")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 1401,  "Flamingo")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 332, 	"Steltkluut")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 294, 	"Morinelplevier")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 905, 	"Breedbekstrandloper")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 370, 	"Gestreepte strandloper")
-#GetSpeciesPlot(start_year,end_year, 1, 12, 253, 	"Grauwe franjepoot")
+
+GetSpeciesPlot(start_year,end_year, 1, 12, 781,   "Zwarte Rotgans")
+GetSpeciesPlot(start_year,end_year, 1, 12, 769,   "Witbuikrotgans")
+GetSpeciesPlot(start_year,end_year, 1, 12, 313,   "Roodhalsgans")
+GetSpeciesPlot(start_year,end_year, 1, 12, 327,   "Sneeuwgans")
+GetSpeciesPlot(start_year,end_year, 1, 12, 338,   "Taigarietgans")
+GetSpeciesPlot(start_year,end_year, 1, 12, 244,   "Dwerggans")
+GetSpeciesPlot(start_year,end_year, 1, 12, 772,   "Witoogeend")
+GetSpeciesPlot(start_year,end_year, 1, 12, 264,   "Ijseend")
+GetSpeciesPlot(start_year,end_year, 1, 12, 216,   "Alpengierzwaluw")
+GetSpeciesPlot(start_year,end_year, 1, 12, 18,    "Kwartelkoning")
+GetSpeciesPlot(start_year,end_year, 1, 12, 17,    "Porseleinhoen")
+GetSpeciesPlot(start_year,end_year, 1, 12, 19,    "Kraanvogel")
+GetSpeciesPlot(start_year,end_year, 1, 12, 1401,  "Flamingo")
+GetSpeciesPlot(start_year,end_year, 1, 12, 332, 	"Steltkluut")
+GetSpeciesPlot(start_year,end_year, 1, 12, 294, 	"Morinelplevier")
+GetSpeciesPlot(start_year,end_year, 1, 12, 905, 	"Breedbekstrandloper")
+GetSpeciesPlot(start_year,end_year, 1, 12, 370, 	"Gestreepte strandloper")
+GetSpeciesPlot(start_year,end_year, 1, 12, 253, 	"Grauwe franjepoot")
 GetSpeciesPlot(start_year,end_year, 1, 12, 318, 	"Rosse franjepoot")
 GetSpeciesPlot(start_year,end_year, 1, 12, 307, 	"Poelruiter")
 GetSpeciesPlot(start_year,end_year, 1, 12, 1387,  "Vorkstaartmeeuw")

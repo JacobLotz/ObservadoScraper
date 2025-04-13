@@ -1,14 +1,8 @@
 # Import classes
 from datetime import date
 import pandas as pd
-import sys
 import os
- 
-# Get current directory
-path = os.getcwd()
-# Parent directory
-parent = os.path.dirname(path)
-sys.path.insert(0,parent)
+
 from classes import *
 
 """
@@ -21,7 +15,8 @@ the observations are printed to a file.
 start = "2024-01-01"
 end = date.today()
 
-filename = parent + "/results.txt"
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+filename = os.path.join(parent_dir, 'results.txt')
 File = open(filename,"w+")
 
 # Write headers:

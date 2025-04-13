@@ -3,13 +3,17 @@ import simplekml
 import time
 import json
 from selenium.webdriver.common.keys import Keys
+import os
 
-from classes import *
+import time
+
+from .obs import Observation
+from .base import ScrapeBase
 
 # import password from external file
 import sys
 sys.path.append('../')
-from password import username_in, password_in
+from passwords import username_in, password_in
 
 # Class inheriting from baseclass which creates a collection of observations and uses 
 # the class Observation to get its data. Class can be constructed by giving a link 
@@ -84,7 +88,11 @@ class ObsCollection(ScrapeBase):
    # Method which imports the point for the selffind rankin
    def ImportPoints(self):
       self.Points = {}
-      with open("../data/points.json", "r") as config_file:
+
+      parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+      filename = os.path.join(parent_dir, 'results.txt')
+      os.path.join(parent_dir, 'data/points.json')
+      with open(os.path.join(parent_dir, 'data/points.json'), "r") as config_file:
          self.Points = json.load(config_file)
       
 
@@ -191,7 +199,7 @@ class ObsCollection(ScrapeBase):
          self.LinkObs = iLink
          self.CorrectLinkObs()
 
-         CurObservation = obs.Observation(self.LinkObs, self.browser)
+         CurObservation = Observation(self.LinkObs, self.browser)
          NoGps = CurObservation.GetData();
          
          
@@ -219,7 +227,7 @@ class ObsCollection(ScrapeBase):
          self.LinkObs = iLink
          self.CorrectLinkObs()
 
-         CurObservation = obs.Observation(self.LinkObs, self.browser)
+         CurObservation = Observation(self.LinkObs, self.browser)
          NoGps = CurObservation.GetData();
 
          # Check if selffind
@@ -270,7 +278,7 @@ class ObsCollection(ScrapeBase):
       self.LogIn()
       self.SetLang()
       link = "https://waarneming.nl/observation/207490728/" 
-      self.Observation = obs.Observation(link, self.browser)
+      self.Observation = Observation(link, self.browser)
       NoGps = self.Observation.GetData();
       self.UnitCheckObs()
       self.CloseWebDriver()
