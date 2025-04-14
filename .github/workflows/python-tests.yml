@@ -36,7 +36,6 @@ jobs:
 
       - name: Mock passwords for CI
         run: |
-          mkdir -p classes
           cp tests/mocks/passwords.py passwords/passwords.py
         
       - name: Run tests
