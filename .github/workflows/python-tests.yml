@@ -3,46 +3,33 @@ name: Python Tests with Conda Environment
 on:
   push:
     branches:
-      - main
+      - '*'
   pull_request:
     branches:
-      - main
+      - '*'
+
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    # Clear pip cache
-    - name: Clear pip cache
-      run: |
-        python -m pip cache purge
-
-    # Clear conda cache
-    - name: Clear conda cache
-      run: |
-        conda clean --all --yes
-
-    - name: Set up Conda environment
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        miniconda-version: 'latest'
-        auto-activate-base: false
-
-    - name: Run 'conda init' to setup Conda
-      run: |
-        conda init bash
-
-    - name: Create Conda environment from environment.yml
-      run: |
-        conda init
-        conda env create -f environment.yml
-        source ~/.bashrc  # To load the conda environment properly
-        conda activate observadoscraper
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: 'latest'
+          channels: conda-forge
+          mamba-version: "*"
+          channel-priority: true
+          auto-update-conda: false
+          auto-activate-base: false
+          environment-file: environment.yml
+          activate-environment: observadoscraper
+          run: conda list
 
     - name: Run tests
       run: |
         pytest tests --maxfail=1 --disable-warnings -q
+
+
