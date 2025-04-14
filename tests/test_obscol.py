@@ -17,7 +17,7 @@ class TestObsCollection:
 
 	def teardown_method(self, method):
 		print(f"Tearing down {method}")
-		self.base.CloseWebDriver()
+		self.obscol.CloseWebDriver()
 
 
 	def test_SetName(self):
