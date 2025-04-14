@@ -18,6 +18,7 @@ class TestObservation:
 
 	def teardown_method(self, method):
 		print(f"Tearing down {method}")
+		self.base.CloseWebDriver()
 
 
 	def test_GetData(self):
