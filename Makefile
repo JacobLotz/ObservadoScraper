@@ -35,3 +35,6 @@ ranking:
 
 observations:
 	python -m scripts.getobservations
+
+test:
+	pytest
