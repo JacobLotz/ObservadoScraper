@@ -32,15 +32,20 @@ jobs:
         miniconda-version: 'latest'
         auto-activate-base: false
 
+    - name: Run 'conda init' to setup Conda
+      run: |
+        conda init bash
+
     - name: Create Conda environment from environment.yml
       run: |
         conda env create -f environment.yml
+        source ~/.bashrc  # To load the conda environment properly
         conda activate observadoscraper
 
     - name: Install dependencies
       run: |
-        conda install --yes --file environment.yml
         conda activate observadoscraper
+        conda install --yes --file environment.yml
 
     - name: Run tests
       run: |
