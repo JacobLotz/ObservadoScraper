@@ -34,6 +34,11 @@ jobs:
           conda activate observadoscraper
           conda list
 
+        - name: Mock passwords for CI
+          run: |
+            mkdir -p classes
+            cp tests/mocks/passwords.py passwords/passwords.py
+        
       - name: Run tests
         shell: bash -l {0}
         run: |
