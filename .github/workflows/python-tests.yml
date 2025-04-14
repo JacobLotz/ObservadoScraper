@@ -45,5 +45,4 @@ jobs:
 
     - name: Run tests
       run: |
-        conda activate observadoscraper
         pytest tests --maxfail=1 --disable-warnings -q
