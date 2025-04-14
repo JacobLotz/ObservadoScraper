@@ -8,14 +8,13 @@ on:
     branches:
       - '*'
 
-
 jobs:
   test:
     runs-on: ubuntu-latest
 
-
     steps:
       - uses: actions/checkout@v2
+
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: 'latest'
@@ -26,10 +25,10 @@ jobs:
           auto-activate-base: false
           environment-file: environment.yml
           activate-environment: observadoscraper
-          run: conda list
 
-    - name: Run tests
-      run: |
-        pytest tests --maxfail=1 --disable-warnings -q
+      - name: Show Conda packages
+        run: conda list
 
+      - name: Run tests
+        run: pytest tests --maxfail=1 --disable-warnings -q
 
