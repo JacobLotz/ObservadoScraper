@@ -25,10 +25,12 @@ jobs:
           auto-activate-base: false
           environment-file: environment.yml
           activate-environment: observadoscraper
+          create-environment: true  # 👈 This line is critical!
 
       - name: Show Conda packages
         run: conda list
 
       - name: Run tests
+        shell: bash -l {0}
         run: pytest tests --maxfail=1 --disable-warnings -q
 
