@@ -38,6 +38,7 @@ jobs:
 
     - name: Create Conda environment from environment.yml
       run: |
+        conda init
         conda env create -f environment.yml
         source ~/.bashrc  # To load the conda environment properly
         conda activate observadoscraper
