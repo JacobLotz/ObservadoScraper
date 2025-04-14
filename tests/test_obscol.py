@@ -24,36 +24,11 @@ class TestObsCollection:
 		self.obscol.SetName("test.kml")
 		assert self.obscol.Name == "test.kml"
 
+	def test_GetObservations(self):
+		self.obscol.SetLang()
+		time.sleep(1)
+		self.obscol.GetObservations()
 
-#	def test_SetLangNL(self):
-#		self.obscol.Lang="nl"
-#		self.obscol.SetLang()
-#		self.obscol.Link = self.testlink
-#		self.obscol.GetSoup()
-#		time.sleep(1)
-#
-#		lang = self.obscol.browser.find_element(By.TAG_NAME, "html").get_attribute("lang")
-#
-#		assert lang == "nl"
-#
-#
-#	def test_SetLangEn(self):
-#		self.obscol.Lang="en"
-#		self.obscol.SetLang()
-#		self.obscol.Link = self.testlink
-#		self.obscol.GetSoup()
-#		time.sleep(1)
-#
-#		lang = self.obscol.browser.find_element(By.TAG_NAME, "html").get_attribute("lang")
-#
-#		assert lang == "en"
-#
-#
-#	def test_GetObservations(self):
-#		self.obscol.SetLang()
-#		time.sleep(1)
-#		self.obscol.GetObservations()
-#
-#		assert len(self.obscol.Obs) == 6
-#		assert self.obscol.Obs[0] == "/observation/344360732/"
+		assert len(self.obscol.Obs) == 6
+		assert self.obscol.Obs[0] == "/observation/344360732/"
 		

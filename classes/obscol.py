@@ -11,8 +11,6 @@ from .obs import Observation
 from .base import ScrapeBase
 
 # import password from external file
-import sys
-sys.path.append('../')
 from passwords.passwords import username_in, password_in
 
 # Class inheriting from baseclass which creates a collection of observations and uses 
