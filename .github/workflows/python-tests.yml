@@ -1,0 +1,46 @@
+name: Python Tests with Conda Environment
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: 'latest'
+          channels: conda-forge
+          mamba-version: "*"
+          channel-priority: true
+          auto-update-conda: false
+          auto-activate-base: false
+
+      - name: Create Conda environment from environment.yml
+        shell: bash -l {0}
+        run: mamba env create -f environment.yml
+
+      - name: Show Conda packages
+        shell: bash -l {0}
+        run: |
+          conda activate observadoscraper
+          conda list
+
+      - name: Mock passwords for CI
+        run: |
+          cp tests/mocks/passwords.py passwords/passwords.py
+        
+      - name: Run tests
+        shell: bash -l {0}
+        run: |
+          conda activate observadoscraper
+          export PYTHONPATH=$(pwd)
+          pytest tests --maxfail=1 --disable-warnings -q

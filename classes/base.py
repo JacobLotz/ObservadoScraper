@@ -12,6 +12,7 @@ class ScrapeBase:
 
    def SetParam(self):
       self.Wait = 0
+      self.Lang = 'nl'
       self.chrome_options = Options()
       self.chrome_options.add_argument("--disable-extensions")
       self.chrome_options.add_argument("--disable-gpu")
