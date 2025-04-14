@@ -23,14 +23,19 @@ jobs:
           channel-priority: true
           auto-update-conda: false
           auto-activate-base: false
-          environment-file: environment.yml
-          activate-environment: observadoscraper
-          create-environment: true  # 👈 This line is critical!
+
+      - name: Create Conda environment from environment.yml
+        shell: bash -l {0}
+        run: mamba env create -f environment.yml
 
       - name: Show Conda packages
-        run: conda list
+        shell: bash -l {0}
+        run: |
+          conda activate observadoscraper
+          conda list
 
       - name: Run tests
         shell: bash -l {0}
-        run: pytest tests --maxfail=1 --disable-warnings -q
-
+        run: |
+          conda activate observadoscraper
+          pytest tests --maxfail=1 --disable-warnings -q
