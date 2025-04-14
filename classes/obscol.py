@@ -13,7 +13,7 @@ from .base import ScrapeBase
 # import password from external file
 import sys
 sys.path.append('../')
-from passwords import username_in, password_in
+from passwords.passwords import username_in, password_in
 
 # Class inheriting from baseclass which creates a collection of observations and uses 
 # the class Observation to get its data. Class can be constructed by giving a link 
