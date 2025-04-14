@@ -3,6 +3,7 @@ import re
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 from .base import ScrapeBase
 
@@ -36,7 +37,17 @@ class MigClass(ScrapeBase):
       self.PageSoup = soup(self.browser.page_source, "html.parser")
 
    def GetNSquares(self):
-      element = self.browser.find_element("css selector", ".panel-body.map-legend")
+      try:
+         element = WebDriverWait(self.browser, 2).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".panel-body.map-legend"))
+            )
+
+      except TimeoutException:
+         print("Timed out waiting for element, continuing...")
+         print(self.Link)
+         print("\n.")
+         return 0
+
       text = element.text
       
       numbers = re.findall(r'\d+', text)
