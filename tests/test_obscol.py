@@ -11,7 +11,7 @@ class TestObsCollection:
 
 		self.testlink = "https://waarneming.nl/users/41541/observations/?date_after=2025-04-11&date_before=2025-04-12&species_group=&rarity=&search=&advanced=on&species=&sex=&month=&country_division=&life_stage=&activity=&method=&validation_status="
 		self.obscol = ObsCollection(self.testlink)
-		#self.obscol.chrome_options.add_argument("--headless")
+		self.obscol.chrome_options.add_argument("--headless")
 		self.obscol.CreateWebDriver()
 
 
