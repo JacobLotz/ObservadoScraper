@@ -46,7 +46,7 @@ class ObsCollection(ScrapeBase):
       url = "https://waarneming.nl/generic/select-language-modal/"
       self.browser.get(url)
 
-      button = self.browser.find_element("xpath", "//button[@value='nl']")
+      button = self.browser.find_element("xpath", "//button[@value='"+self.Lang+"']")
       button.click()
 
 
@@ -123,7 +123,10 @@ class ObsCollection(ScrapeBase):
 
 
          # Check if on last page, if so: end loop.
-         LastPage = self.PageSoup.findAll('li', attrs={'last'})[0].find('a').get('href')
+         try:
+            LastPage = self.PageSoup.findAll('li', attrs={'last'})[0].find('a').get('href')
+         except: # Exception for one page
+            LastPage = None
 
          if LastPage == None:
             IfEnd = True
@@ -173,7 +176,10 @@ class ObsCollection(ScrapeBase):
             self.Obs.append(links[i])
 
          # Check if on last page, if so: end loop.
-         LastPage = self.PageSoup.findAll('li', attrs={'last'})[0].find('a').get('href')
+         try:
+            LastPage = self.PageSoup.findAll('li', attrs={'last'})[0].find('a').get('href')
+         except: # Exception for one page
+            LastPage = None
 
          if LastPage == None:
             IfEnd = True
@@ -257,39 +263,4 @@ class ObsCollection(ScrapeBase):
 
    def SetOutputFile(self, File):
       self.File = File
-
-   def UnitCheckObs(self):
-      if "Raaf" not in self.Observation.Name:
-         print("Error in name")
-      #print(self.Observation.Name)
-
-      if "52.03" not in str(self.Observation.Latitude):
-         print("Error in Latitude")
-         print(self.Observation.Latitude)
-
-      if "5.37" not in str(self.Observation.Longitude):
-         print("Error in Longitude")
-         print(self.Observation.Longitude)
-
-
-   def UnitChecks(self):
-      # New website
-      self.CreateWebDriver()
-      self.LogIn()
-      self.SetLang()
-      link = "https://waarneming.nl/observation/207490728/" 
-      self.Observation = Observation(link, self.browser)
-      NoGps = self.Observation.GetData();
-      self.UnitCheckObs()
-      self.CloseWebDriver()
-
-      # GetObservations new website
-      self.CreateWebDriver()
-      self.LogIn()
-      self.Link = "https://waarneming.nl/users/41541/observations/?after_date=2021-01-01&before_date=2021-01-06&species_group=&rarity=&search=&species=&sex=&province=&validation_status=&life_stage=&activity=&method3/users/41541/observations/?after_date=2021-01-01&before_date=2021-01-06&page=1"
-      self.GetObservations()
-      if len(self.Obs) != 56:
-         print("Error in GetObservations")
-         print(len(self.Obs))
-      self.CloseWebDriver()
       

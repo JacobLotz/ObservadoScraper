@@ -5,7 +5,7 @@ PYTHON=python
 SCRIPT=scripts/migrationtrend.py
 MODULE=scripts.migrationtrend
 ENV_NAME=envfile
-ENV_FILE=observadoscraper
+ENV_FILE=environment.yml
 
 # Default task
 run:
