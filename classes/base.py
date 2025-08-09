@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup as soup
+import time
 
 # Base class containing methods to get soup and set parameters.
 class ScrapeBase:
@@ -21,6 +22,7 @@ class ScrapeBase:
 
    def GetSoup(self):
       self.browser.get(self.Link)
+      time.sleep(self.Wait)
       self.PageSoup = soup(self.browser.page_source, "html.parser")
 
    def PrintSoup(self):

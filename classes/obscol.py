@@ -43,7 +43,7 @@ class ObsCollection(ScrapeBase):
    def SetLang(self):
       url = "https://waarneming.nl/generic/select-language-modal/"
       self.browser.get(url)
-
+      time.sleep(3)
       button = self.browser.find_element("xpath", "//button[@value='"+self.Lang+"']")
       button.click()
 
@@ -60,7 +60,6 @@ class ObsCollection(ScrapeBase):
 
       # If all links are collected create kml and scrape the pages for the data
       print('Starting extraction of data of observations')
-
       self.CreateKML()
       self.ScrapePages()
       self.SaveKML()
