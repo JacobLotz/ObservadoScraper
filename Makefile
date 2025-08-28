@@ -18,6 +18,10 @@ setup:
 	conda env create -f $(ENV_FILE)
 	conda activate $(ENV_NAME)
 
+loadenv:
+	@echo "Loading Conda environment: $(ENV_NAME)"
+	conda activate $(ENV_NAME)
+
 # Clean up __pycache__ files
 clean:
 	@echo "Cleaning up cache..."
