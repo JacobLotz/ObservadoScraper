@@ -3,6 +3,10 @@ import simplekml
 import time
 import json
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import os
 
 import time
@@ -43,8 +47,10 @@ class ObsCollection(ScrapeBase):
    def SetLang(self):
       url = "https://waarneming.nl/generic/select-language-modal/"
       self.browser.get(url)
-      time.sleep(3)
-      button = self.browser.find_element("xpath", "//button[@value='"+self.Lang+"']")
+
+      # Wait for the language button and click it directly
+      wait = WebDriverWait(self.browser, 10)
+      button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f"button[name='language'][value='{self.Lang}']")))
       button.click()
 
 
