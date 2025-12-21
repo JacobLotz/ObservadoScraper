@@ -3,54 +3,98 @@ from datetime import date
 import pandas as pd
 import os
 
-from classes import *
+from classes import ObservationCollectionScraper, ObservationProcessor
+from classes.utils import get_results_path
 
 """
-This script updates the self-found competition by checking the observations of the 
-participating members on the markers "self" or "qwery". If the claim should be awarded
+This script updates the self-found competition by checking the observations of the
+participating members for markers "self" or "qwerty". If the claim should be awarded
 with points in the competition it will assign the points and print the details. All
 the observations are printed to a file.
+
+Demonstrates the new modular architecture:
+1. Scrape observations for each participant
+2. Save scraped data to CSV files
+3. Load and process (filter self-finds, assign points)
+4. Generate ranking report
 """
 
 start = "2024-01-01"
 end = date.today()
 
+# Get results file path (in results/ directory)
+filename = get_results_path('results.txt')
+
+# Load points mapping (from data/ directory, not results/)
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-filename = os.path.join(parent_dir, 'results.txt')
-File = open(filename,"w+")
+points_file = os.path.join(parent_dir, 'data/points.json')
 
-# Write headers:
-File.writelines('{:<27}{:<6}{:<1}{:<10}{:<24}{:<20}'.format("Soort", "Punten", " ","Datum", "Locatie", "Laatste update: " + str(end)))
-File.writelines('\n----------------------------------------------------------------------------------------------')
+# Initialize results file
+with open(filename, "w+") as f:
+    f.write('{:<27}{:<6}{:<1}{:<10}{:<24}{:<20}\n'.format(
+        "Soort", "Punten", " ", "Datum", "Locatie", "Laatste update: " + str(end)))
+    f.write('----------------------------------------------------------------------------------------------')
 
+# Participant configuration
+participants = [
+    {"name": "Daan", "user_id": "22414"},
+    {"name": "Ruben", "user_id": "3219"},
+    {"name": "Jurriën", "user_id": "17815"},
+    {"name": "Jacob", "user_id": "41541"}
+]
 
-File.writelines('\nDaan\n')
-link = "https://waarneming.nl/users/22414/observations/?date_after="+ str(start) +"&date_before="+ str(end) + "&species_group=1&rarity=2&page=1"
-collection = ObsCollection(link)
-collection.SetOutputFile(File)
-collection.StartUpdateSelffindRanking()
+# Process each participant
+for participant in participants:
+    print(f"\n{'='*50}")
+    print(f"Processing {participant['name']}...")
+    print(f"{'='*50}")
 
-File.writelines('\n\n----------------------------------------------------------------------------------------------')
-File.writelines('\nRuben\n')
-link = "https://waarneming.nl/users/3219/observations/?date_after="+ str(start) +"&date_before="+ str(end) + "&species_group=1&rarity=2&page=1"
-collection = ObsCollection(link)
-collection.SetOutputFile(File)
-collection.StartUpdateSelffindRanking()
+    # Build link
+    link = (f"https://waarneming.nl/users/{participant['user_id']}/observations/"
+            f"?date_after={start}&date_before={end}&species_group=1&rarity=2&page=1")
 
-File.writelines('\n\n----------------------------------------------------------------------------------------------')
-File.writelines('\nJurri\u00EBn\n')
-link = "https://waarneming.nl/users/17815/observations/?date_after="+ str(start) +"&date_before="+ str(end) + "&species_group=1&rarity=2&page=1"
-collection = ObsCollection(link)
-collection.SetOutputFile(File)
-collection.StartUpdateSelffindRanking()
+    # Import points to filter species during scraping
+    import json
+    with open(points_file, "r") as f:
+        points_dict = json.load(f)
+    species_filter = set(points_dict.keys())
 
-File.writelines('\n\n----------------------------------------------------------------------------------------------')
-File.writelines('\nJacob\n')
-link = "https://waarneming.nl/users/41541/observations/?date_after="+ str(start) +"&date_before="+ str(end) + "&species_group=1&rarity=2&page=1"
-collection = ObsCollection(link)
-collection.SetOutputFile(File)
-collection.StartUpdateSelffindRanking()
+    # Scrape observations
+    scraper = ObservationCollectionScraper(link)
+    df = scraper.scrape(species_filter=species_filter)
 
+    # Save scraped data
+    csv_filename = f"{participant['name'].lower()}_observations.csv"
+    scraper.save(df, csv_filename)
 
-File.writelines('\n')
-File.close()
+    # Process observations
+    processor = ObservationProcessor(df)
+
+    # Filter for self-finds
+    processor = processor.filter_selffinds()
+
+    # Filter by species that have points
+    processor = processor.filter_by_species(list(species_filter))
+
+    # Assign points
+    processor.assign_points(points_file=points_file)
+
+    # Sort by date (oldest first)
+    processor.sort_by_date(ascending=True)
+
+    # Generate report section (filename is just the name, not full path)
+    processor.to_text_report(
+        'results.txt',
+        title=f'\n\n----------------------------------------------------------------------------------------------\n{participant["name"]}'
+    )
+
+    # Print summary
+    summary = processor.get_summary()
+    print(f"\nSummary for {participant['name']}:")
+    print(f"  Self-finds: {summary['total_observations']}")
+    print(f"  Total points: {summary.get('total_points', 0)}")
+
+print("\n" + "="*50)
+print("Ranking update complete!")
+print(f"Report saved to: {filename}")
+print("="*50)

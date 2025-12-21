@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scripts.migrationtrendfun import GetMonthEnd, GetStartDates, GetEndDates, DivideChunks, GetSpeciesPlot
+from scripts.migrationtrendfun import GetMonthEnd, GetStartDates, GetEndDates
 from classes import *
 
 import numpy as np
@@ -33,14 +33,4 @@ def test_GetEndDates():
         datetime.date(2024, 1, 31),
     ]
     assert result == expected
-
-def test_DivideChunks_even_split():
-    data = [1, 2, 3, 4, 5, 6]
-    chunks = list(DivideChunks(data, 2))
-    assert chunks == [[1, 2], [3, 4], [5, 6]]
-
-def test_DivideChunks_uneven_split():
-    data = [1, 2, 3, 4, 5]
-    chunks = list(DivideChunks(data, 2))
-    assert chunks == [[1, 2], [3, 4], [5]]
 
