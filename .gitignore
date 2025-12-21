@@ -13,6 +13,9 @@ passwords/passwords.py
 *.txt
 *.png
 
+# Results folder (contains all output: CSV, KML, TXT, PNG)
+results/
+
 # Config file
 config.py
 

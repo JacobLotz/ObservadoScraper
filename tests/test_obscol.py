@@ -1,9 +1,12 @@
+import pytest
 from classes import *
 import time
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
+@pytest.mark.integration
+@pytest.mark.skip(reason="Legacy integration test - requires live scraping. Use new ObservationCollectionScraper tests instead.")
 class TestObsCollection:
 
 	def setup_method(self, method):

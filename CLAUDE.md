@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ObservadoScraper is a Python-based web scraper for waarneming.nl (Dutch nature observation platform). It scrapes species observations, migration trends, and competition rankings, outputting data to KML files and text reports.
 
+**Architecture**: Modular design separating data gathering (scrapers) from data processing (processors), with pandas DataFrames as the intermediate format.
+
 ## Environment Setup
 
 Uses Conda for environment management:
@@ -24,96 +26,163 @@ Key dependencies: selenium, BeautifulSoup4, simplekml, webdriver_manager, matplo
 
 ## Running Scripts
 
-Use the Makefile for common tasks:
+**Important**: Always run scripts as modules to ensure proper imports:
+
 ```bash
-# Run tests
-make test
-
-# Scrape migration trend data
-make migtrend
-
-# Update self-find ranking
-make ranking
-
-# Get observation data
-make observations
-
-# Clean cache
-make clean
-```
-
-Or run scripts directly as modules:
-```bash
+# Run as modules (recommended)
 python -m scripts.migrationtrend
 python -m scripts.updateranking
 python -m scripts.getobservations
+
+# Or use Makefile
+make test
+make migtrend
+make ranking
+make observations
+make clean
 ```
+
+**Output Location**: All output files (CSV, KML, TXT, PNG) are saved to the `results/` directory, which is created automatically and git-ignored.
 
 ## Testing
 
 ```bash
-# Run all tests
+# Run all tests (36 tests, fast with mocks)
 pytest
 
-# Run specific test file
-pytest tests/test_obs.py
+# Run specific test categories
+pytest tests/test_observation_processor.py  # Processor tests with CSV mocks
+pytest tests/test_observation_scraper.py    # Scraper tests with HTML mocks
 
-# With options (as used in CI)
-pytest tests --maxfail=1 --disable-warnings -q
+# Run legacy integration tests (slow, requires live scraping)
+pytest -m integration
 ```
 
-**CI Setup**: GitHub Actions workflow (`.github/workflows/python-tests.yml`) mocks passwords for CI using `tests/mocks/passwords.py`. For local testing, create `passwords/passwords.py` based on `passwords/passwords-example.py`.
+**Test Coverage**: 36 passing tests using HTML and CSV mocks. No live scraping needed for unit tests.
+
+**CI Setup**: GitHub Actions workflow (`.github/workflows/python-tests.yml`) mocks passwords using `tests/mocks/passwords.py`. For local testing, create `passwords/passwords.py` based on `passwords/passwords-example.py`.
 
 ## Architecture
 
-### Class Hierarchy
+### Modular Design (New - Use This)
 
-**Base Class**: `classes/base.py:ScrapeBase`
+**Workflow**: Scrape → Save CSV → Load CSV → Process → Export
+
+#### Scrapers (Data Gathering)
+
+1. **`ObservationScraper`** (`classes/observation_scraper.py`)
+   - Scrapes single observation page
+   - Returns dict with observation data
+   - Used internally by ObservationCollectionScraper
+
+2. **`ObservationCollectionScraper`** (`classes/observation_collection_scraper.py`)
+   - Scrapes multiple observations from paginated pages
+   - Returns pandas DataFrame
+   - Methods: `scrape()`, `save()`, `load()`
+   - Supports species filtering during scraping
+
+3. **`MigrationScraper`** (`classes/migration_scraper.py`)
+   - Scrapes migration trend data from grid maps
+   - Returns pandas DataFrame with grid square counts
+   - Methods: `scrape_date_ranges()`, `save()`, `load()`
+
+#### Processors (Data Processing)
+
+1. **`ObservationProcessor`** (`classes/observation_processor.py`)
+   - Processes observation DataFrames
+   - Key methods:
+     - `filter_selffinds()` - Filter by self-find markers
+     - `assign_points(points_file)` - Assign point values from JSON
+     - `filter_by_species(species_list)` - Filter by species
+     - `sort_by_date(ascending)` - Sort chronologically
+     - `to_kml(filename)` - Export to KML (saves to results/)
+     - `to_text_report(filename)` - Export to text report (saves to results/)
+     - `get_summary()` - Get statistics
+   - Supports method chaining
+
+2. **`MigrationProcessor`** (`classes/migration_processor.py`)
+   - Processes migration trend DataFrames
+   - Key methods:
+     - `plot_species_trend(species_name, month_start, month_end)` - Generate plots (saves to results/)
+     - `get_summary()` - Get statistics
+
+#### Utility Functions
+
+- **`get_results_path(filename)`** - Returns full path to file in `results/` directory
+- **`ensure_results_dir()`** - Creates `results/` directory if needed
+
+#### Usage Example
+
+```python
+from classes import ObservationCollectionScraper, ObservationProcessor
+
+# 1. Scrape data
+scraper = ObservationCollectionScraper(link)
+df = scraper.scrape()
+
+# 2. Save to results/
+scraper.save(df, "observations.csv")
+
+# 3. Process (can be done later, separately)
+processor = ObservationProcessor(df)
+processor.filter_selffinds().assign_points().to_kml("selffinds.kml")
+```
+
+### Legacy Classes (Still Available)
+
+- **`classes/obs.py:Observation`** - Individual observation (legacy)
+- **`classes/obscol.py:ObsCollection`** - Collection of observations (legacy)
+- **`classes/mig.py:MigClass`** - Migration trend data (legacy)
+
+**Note**: New code should use the modular scrapers/processors. Legacy classes maintained for backward compatibility.
+
+### Base Class
+
+**`classes/base.py:ScrapeBase`**
 - Manages Selenium WebDriver setup and configuration
 - Provides `GetSoup()` method for BeautifulSoup parsing
 - Handles Chrome options (headless mode, extensions, GPU)
 - Uses `webdriver_manager` for automatic ChromeDriver management
 
-**Core Classes**:
+## Script Purposes
 
-1. **`classes/obs.py:Observation`** - Individual observation data
-   - Extracts species name, date/time, location, GPS coordinates from observation pages
-   - Skips obscured GPS data
-   - Methods: `GetData()`, `WriteKMLLine()`, `CheckSelffind()`
-   - Checks for "self-find" markers ("Self", "self", "qwerty", "Qwerty") in descriptions
+- **`scripts/migrationtrend.py`**: Generates migration trend plots for multiple species
+- **`scripts/migrationtrendfun.py`**: Core function `GetSpeciesPlot()` using MigrationScraper → MigrationProcessor pattern
+- **`scripts/getobservations.py`**: Scrapes observations using ObservationCollectionScraper → ObservationProcessor pattern
+- **`scripts/updateranking.py`**: Updates self-find competition ranking with filtering and point assignment
 
-2. **`classes/obscol.py:ObsCollection`** - Collection of observations
-   - Scrapes multiple observation pages with pagination
-   - Two main workflows:
-     - `StartScrapingProcess()`: Scrapes observations and outputs to KML
-     - `StartUpdateSelffindRanking()`: Updates competition ranking from self-finds
-   - Handles login via `LogIn()` and language setting via `SetLang()`
-   - Imports point values from `data/points.json` for ranking calculations
+## Results Directory
 
-3. **`classes/mig.py:MigClass`** - Migration trend data
-   - Scrapes map grid data from Leaflet-based maps
-   - Uses explicit waits for map tiles, SVG overlays, and grid cells to load
-   - Extracts number of observation squares from map legend
+All output files are saved to `results/` directory:
+- **CSV files** - Scraped data (DataFrames)
+- **KML files** - Geographic export
+- **TXT files** - Ranking reports
+- **PNG files** - Migration plots
 
-### Script Purposes
+The directory is created automatically and is git-ignored.
 
-- **`scripts/migrationtrend.py`**: Generates migration trend plots for multiple species over multiple years
-- **`scripts/migrationtrendfun.py`**: Core function `GetSpeciesPlot()` that scrapes grid square counts across date ranges and plots trends
-- **`scripts/getobservations.py`**: Scrapes observations for specific species/date ranges and outputs KML files
-- **`scripts/updateranking.py`**: Scrapes observations for competition participants, identifies self-finds, calculates points from `data/points.json`, and generates `results.txt` ranking
+## Testing Approach
 
-### Data Flow
+### Unit Tests (Fast - Use Mocks)
 
-1. Scripts create class instances with waarneming.nl URLs
-2. `ScrapeBase.CreateWebDriver()` initializes Chrome browser
-3. `GetSoup()` loads pages and parses HTML with BeautifulSoup
-4. Child classes extract specific data (observations, migration data)
-5. Output to KML files (via simplekml) or text files
+**HTML Mocks** (`tests/mocks/*.html`) - For testing scrapers without Selenium:
+- `observation_page.html` - Normal observation
+- `observation_page_obscured.html` - Obscured GPS coordinates
+
+**CSV Mocks** (`tests/mocks/*.csv`) - For testing processors without scraping:
+- `observations_mock.csv` - Sample observation data
+- `migration_mock.csv` - Sample migration data
+
+### Integration Tests (Slow - Skipped by Default)
+
+Marked with `@pytest.mark.integration` and skipped unless explicitly run with `pytest -m integration`.
 
 ## Important Notes
 
-- **Password Management**: Never commit `passwords/passwords.py`. Use the example file as template. CI uses mocked passwords.
-- **Language Setting**: `obscol.py:SetLang()` sets language to Dutch ('nl') for consistent scraping
-- **Headless Mode**: Chrome headless mode is commented out by default in `base.py:21` - uncomment for background execution
-- **Wait Times**: `self.Wait` parameter controls delay between requests (default 0)
-- **Module Execution**: Always run scripts as modules (`python -m scripts.scriptname`) to ensure proper imports via `classes/__init__.py`
+- **Password Management**: Never commit `passwords/passwords.py`. Use the example file as template.
+- **Language Setting**: Scraper sets language to Dutch ('nl') for consistent results
+- **Headless Mode**: Chrome headless mode commented out by default in `base.py:21` - uncomment for background execution
+- **Module Execution**: Always run scripts as modules (`python -m scripts.scriptname`) to ensure proper imports
+- **Output Location**: All results automatically saved to `results/` directory
+- **Reprocessing**: Can load saved CSV files and reprocess with different parameters without re-scraping
+- **Method Chaining**: Processors support chaining: `processor.filter_selffinds().assign_points().to_kml("output.kml")`

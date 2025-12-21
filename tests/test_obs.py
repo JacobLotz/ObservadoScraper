@@ -1,7 +1,9 @@
-
+import pytest
 from classes import *
 
 
+@pytest.mark.integration
+@pytest.mark.skip(reason="Legacy integration test - requires live scraping. Use new ObservationProcessor tests instead.")
 class TestObservation:
 
 	def setup_method(self, method):
