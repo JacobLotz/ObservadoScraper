@@ -7,6 +7,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+from .constants import DEFAULT_LANGUAGE, DEFAULT_WAIT_TIME
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,8 +40,8 @@ class ScrapeBase:
         extensions disabled, GPU disabled, and sandbox disabled for Linux compatibility.
         Headless mode is available but commented out by default.
         """
-        self.wait = 0
-        self.lang = "nl"
+        self.wait = DEFAULT_WAIT_TIME
+        self.lang = DEFAULT_LANGUAGE
         self.chrome_options = Options()
         self.chrome_options.add_argument("--disable-extensions")
         self.chrome_options.add_argument("--disable-gpu")

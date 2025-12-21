@@ -12,6 +12,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from passwords.passwords import password_in, username_in
 
 from .base import ScrapeBase
+from .constants import LANGUAGE_BUTTON_TIMEOUT
 from .observation_scraper import ObservationScraper
 from .utils import get_results_path
 
@@ -43,7 +44,7 @@ class ObservationCollectionScraper(ScrapeBase):
         self.browser.get(url)
 
         # Wait for the language button and click it directly
-        wait = WebDriverWait(self.browser, 10)
+        wait = WebDriverWait(self.browser, LANGUAGE_BUTTON_TIMEOUT)
         button = wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, f"button[name='language'][value='{self.lang}']")

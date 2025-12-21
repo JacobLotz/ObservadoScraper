@@ -8,11 +8,6 @@ ObservadoScraper is a Python-based web scraper for waarneming.nl (Dutch nature o
 
 **Architecture**: Modular design separating data gathering (scrapers) from data processing (processors), with pandas DataFrames as the intermediate format.
 
-## TODO - Cleanup Tasks
-
-### Medium Priority
-- [ ] **Extract magic numbers** - Move hardcoded values (timeouts, sleep values) to named constants
-
 ## Environment Setup
 
 Uses Conda for environment management:
@@ -235,6 +230,13 @@ processor.filter_selffinds().assign_points().to_kml("selffinds.kml")
 - Provides `get_soup()` method for BeautifulSoup parsing
 - Handles Chrome options (headless mode, extensions, GPU)
 - Uses `webdriver_manager` for automatic ChromeDriver management
+
+### Constants
+
+**`classes/constants.py`**
+- Centralizes all magic numbers (timeouts, default values, thresholds)
+- Imported and used throughout scraper and processor classes
+- Adjust these values to tune scraper behavior
 
 ## Script Purposes
 

@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from .base import ScrapeBase
+from .constants import LEGEND_PANEL_TIMEOUT, MAP_LOADING_TIMEOUT, MIN_GRID_CELLS_RENDERED
 from .utils import get_results_path
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class MigrationScraper(ScrapeBase):
         Load the page and wait for map elements to render.
         """
         self.browser.get(self.link)
-        wait = WebDriverWait(self.browser, 4)
+        wait = WebDriverWait(self.browser, MAP_LOADING_TIMEOUT)
 
         try:
             # Wait for map tiles to load
@@ -52,7 +53,7 @@ class MigrationScraper(ScrapeBase):
                         ".leaflet-overlay-pane svg path, .leaflet-overlay-pane svg rect, .leaflet-overlay-pane svg polygon",
                     )
                 )
-                > 10
+                > MIN_GRID_CELLS_RENDERED
             )
 
             # Wait for the legend panel to appear
@@ -71,7 +72,7 @@ class MigrationScraper(ScrapeBase):
         Returns 0 if unable to extract.
         """
         try:
-            element = WebDriverWait(self.browser, 2).until(
+            element = WebDriverWait(self.browser, LEGEND_PANEL_TIMEOUT).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".panel-body.map-legend"))
             )
         except TimeoutException:
