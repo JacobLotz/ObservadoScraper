@@ -1,9 +1,13 @@
+import logging
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.ticker import MultipleLocator
 
 from .utils import get_results_path
+
+logger = logging.getLogger(__name__)
 
 
 class MigrationProcessor:
@@ -40,7 +44,7 @@ class MigrationProcessor:
             Path to saved plot file
         """
         if len(self.df) == 0:
-            print(f"No data available for {species_name}")
+            logger.warning(f"No data available for {species_name}")
             return None
 
         # Extract years from dates
@@ -138,7 +142,7 @@ class MigrationProcessor:
         plt.savefig(filepath)
         plt.close()
 
-        print(f"Saved plot to: {filepath}")
+        logger.info(f"Saved plot to: {filepath}")
         return filepath
 
     def get_dataframe(self):

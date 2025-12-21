@@ -1,10 +1,13 @@
 import json
+import logging
 import os
 
 import pandas as pd
 import simplekml
 
 from .utils import get_results_path
+
+logger = logging.getLogger(__name__)
 
 
 class ObservationProcessor:
@@ -130,7 +133,7 @@ class ObservationProcessor:
 
         filepath = get_results_path(filename)
         kml.save(filepath, format=True)
-        print(f"Saved KML to: {filepath}")
+        logger.info(f"Saved KML to: {filepath}")
 
     def to_text_report(self, filename, title="Observations"):
         """
@@ -156,7 +159,7 @@ class ObservationProcessor:
                 f.write("\n")
                 f.write("{:<27}{:>6}\n".format("Totaal: ", total))
 
-        print(f"Appended report to: {filepath}")
+        logger.info(f"Appended report to: {filepath}")
 
     def get_dataframe(self):
         """

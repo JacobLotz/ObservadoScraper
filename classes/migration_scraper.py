@@ -1,3 +1,4 @@
+import logging
 import re
 
 import pandas as pd
@@ -9,6 +10,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from .base import ScrapeBase
 from .utils import get_results_path
+
+logger = logging.getLogger(__name__)
 
 
 class MigrationScraper(ScrapeBase):
@@ -58,7 +61,7 @@ class MigrationScraper(ScrapeBase):
             )
 
         except Exception as e:
-            print("Timed out waiting for map to load.")
+            logger.warning("Timed out waiting for map to load")
 
         self.page_soup = soup(self.browser.page_source, "html.parser")
 
@@ -72,9 +75,7 @@ class MigrationScraper(ScrapeBase):
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".panel-body.map-legend"))
             )
         except TimeoutException:
-            print("Timed out waiting for element, continuing...")
-            print(self.link)
-            print("\n.")
+            logger.warning(f"Timed out waiting for element, continuing... Link: {self.link}")
             return 0
 
         text = element.text
@@ -108,7 +109,7 @@ class MigrationScraper(ScrapeBase):
         self._get_soup_with_wait()
         n_squares = self._get_n_squares()
 
-        print(f"{start_date}, {n_squares} squares")
+        logger.info(f"{start_date}, {n_squares} squares")
 
         return {
             "start_date": start_date,
@@ -150,7 +151,7 @@ class MigrationScraper(ScrapeBase):
         """
         filepath = get_results_path(filename)
         df.to_csv(filepath, index=False)
-        print(f"Saved migration data to: {filepath}")
+        logger.info(f"Saved migration data to: {filepath}")
 
     @staticmethod
     def load(filename):
@@ -168,5 +169,5 @@ class MigrationScraper(ScrapeBase):
         # Convert date strings back to datetime
         df["start_date"] = pd.to_datetime(df["start_date"])
         df["end_date"] = pd.to_datetime(df["end_date"])
-        print(f"Loaded {len(df)} migration data points from: {filepath}")
+        logger.info(f"Loaded {len(df)} migration data points from: {filepath}")
         return df

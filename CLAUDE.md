@@ -11,7 +11,6 @@ ObservadoScraper is a Python-based web scraper for waarneming.nl (Dutch nature o
 ## TODO - Cleanup Tasks
 
 ### Medium Priority
-- [ ] **Replace print with logging** - Replace ~29 print statements in classes/ with Python logging module
 - [ ] **Extract magic numbers** - Move hardcoded values (timeouts, sleep values) to named constants
 
 ## Environment Setup
@@ -274,6 +273,20 @@ The directory is created automatically and is git-ignored.
 - Descriptions are modified
 - GPS coordinates are obscured/revealed
 - Any other field changes on the website
+
+## Logging
+
+The project uses Python's built-in `logging` module for all output:
+
+- **Configuration**: Main scripts (in `scripts/`) configure logging with `logging.basicConfig()` at INFO level
+- **Format**: `%(asctime)s - %(name)s - %(levelname)s - %(message)s`
+- **Log Levels Used**:
+  - `INFO`: Normal operational output (progress updates, page numbers, percentages, file saves/loads, completion messages)
+  - `WARNING`: Timeouts, missing data, non-critical issues
+  - `DEBUG`: Debugging output (HTML page dumps, internal state)
+- **Per-Module Loggers**: Each module creates its own logger with `logger = logging.getLogger(__name__)`
+
+To see debug messages (like HTML dumps), configure scripts with `level=logging.DEBUG` instead of `level=logging.INFO`.
 
 ## Important Notes
 

@@ -1,7 +1,10 @@
 import calendar
 import datetime
+import logging
 
 from classes import MigrationProcessor, MigrationScraper
+
+logger = logging.getLogger(__name__)
 
 
 def get_month_end(date_in_):
@@ -56,7 +59,7 @@ def get_species_plot(year_start, year_end, month_start, month_end, species_id, n
         species_id: Species ID for waarneming.nl
         name: Species name for plot title
     """
-    print(f"Working on: {name}")
+    logger.info(f"Working on: {name}")
 
     # Generate date bins
     years_range = range(year_start, year_end + 1, 1)
@@ -81,5 +84,5 @@ def get_species_plot(year_start, year_end, month_start, month_end, species_id, n
     processor = MigrationProcessor(df)
     plot_file = processor.plot_species_trend(name, month_start, month_end)
 
-    print(f"Completed: {name}")
+    logger.info(f"Completed: {name}")
     return plot_file

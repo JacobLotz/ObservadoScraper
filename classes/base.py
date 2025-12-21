@@ -1,3 +1,4 @@
+import logging
 import time
 
 from bs4 import BeautifulSoup as soup
@@ -5,6 +6,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+
+logger = logging.getLogger(__name__)
 
 
 class ScrapeBase:
@@ -56,7 +59,7 @@ class ScrapeBase:
 
     def print_soup(self):
         """Print the prettified HTML of the current page."""
-        print(self.page_soup.prettify)
+        logger.debug(self.page_soup.prettify())
 
     def create_web_driver(self):
         """

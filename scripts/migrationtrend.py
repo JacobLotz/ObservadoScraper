@@ -1,6 +1,12 @@
+import logging
 from datetime import datetime as dt
 
 from scripts.migrationtrendfun import get_species_plot
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 end_year = dt.now().year - 1
 start_year = end_year - 5

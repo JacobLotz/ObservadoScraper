@@ -1,9 +1,16 @@
 # Import classes
+import logging
 import os
 from datetime import date
 
 from classes import ObservationCollectionScraper, ObservationProcessor
 from classes.utils import get_results_path
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 """
 This script updates the self-found competition by checking the observations of the
@@ -49,9 +56,9 @@ participants = [
 
 # Process each participant
 for participant in participants:
-    print(f"\n{'='*50}")
-    print(f"Processing {participant['name']}...")
-    print(f"{'='*50}")
+    logger.info(f"\n{'='*50}")
+    logger.info(f"Processing {participant['name']}...")
+    logger.info(f"{'='*50}")
 
     # Build link
     link = (
@@ -97,11 +104,11 @@ for participant in participants:
 
     # Print summary
     summary = processor.get_summary()
-    print(f"\nSummary for {participant['name']}:")
-    print(f"  Self-finds: {summary['total_observations']}")
-    print(f"  Total points: {summary.get('total_points', 0)}")
+    logger.info(f"\nSummary for {participant['name']}:")
+    logger.info(f"  Self-finds: {summary['total_observations']}")
+    logger.info(f"  Total points: {summary.get('total_points', 0)}")
 
-print("\n" + "=" * 50)
-print("Ranking update complete!")
-print(f"Report saved to: {filename}")
-print("=" * 50)
+logger.info("\n" + "=" * 50)
+logger.info("Ranking update complete!")
+logger.info(f"Report saved to: {filename}")
+logger.info("=" * 50)

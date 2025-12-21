@@ -1,3 +1,4 @@
+import logging
 import re
 import time
 
@@ -13,6 +14,8 @@ from passwords.passwords import password_in, username_in
 from .base import ScrapeBase
 from .observation_scraper import ObservationScraper
 from .utils import get_results_path
+
+logger = logging.getLogger(__name__)
 
 
 class ObservationCollectionScraper(ScrapeBase):
@@ -63,14 +66,14 @@ class ObservationCollectionScraper(ScrapeBase):
         base_link = self.link[0:-1]
         page = 0
 
-        print("Starting to retrieve links from overview pages")
+        logger.info("Starting to retrieve links from overview pages")
 
         is_end = False
         while not is_end:
             time.sleep(self.wait)
             page += 1
 
-            print(f"Currently in page {page}\r", end="")
+            logger.info(f"Currently in page {page}")
             self.link = base_link + str(page)
             self.get_soup()
 
@@ -86,10 +89,7 @@ class ObservationCollectionScraper(ScrapeBase):
 
             if last_page is None:
                 is_end = True
-                print(f"Currently in page {page}")
-                print(
-                    f"Found {page} pages of observations having a total of {len(obs_links)} observations.\n"
-                )
+                logger.info(f"Completed pagination: {page} pages, {len(obs_links)} observations")
 
         return obs_links
 
@@ -147,8 +147,7 @@ class ObservationCollectionScraper(ScrapeBase):
         Returns:
             pandas DataFrame with observation data
         """
-        print("\n-------------------------------------")
-        print("Starting to scrape observation collection")
+        logger.info("Starting to scrape observation collection")
 
         # Get links to relevant observations
         self.create_web_driver()
@@ -160,17 +159,14 @@ class ObservationCollectionScraper(ScrapeBase):
             obs_links = self._get_observation_links()
 
         # Scrape each observation
-        print("Starting extraction of data from observations")
+        logger.info("Starting extraction of data from observations")
         observations = []
 
         for i, link in enumerate(obs_links):
             time.sleep(self.wait)
 
             progress = int((i + 1) / len(obs_links) * 100)
-            if progress < 100:
-                print(f"Scraping pages [{progress}%]\r", end="")
-            else:
-                print("Scraping pages [100%]")
+            logger.info(f"Scraping pages [{progress}%]")
 
             full_link = "https://waarneming.nl" + link
             obs_scraper = ObservationScraper(full_link, self.browser)
@@ -183,7 +179,7 @@ class ObservationCollectionScraper(ScrapeBase):
 
         # Convert to DataFrame
         df = pd.DataFrame(observations)
-        print(f"Successfully scraped {len(df)} observations")
+        logger.info(f"Successfully scraped {len(df)} observations")
 
         return df
 
@@ -197,7 +193,7 @@ class ObservationCollectionScraper(ScrapeBase):
         """
         filepath = get_results_path(filename)
         df.to_csv(filepath, index=False)
-        print(f"Saved data to: {filepath}")
+        logger.info(f"Saved data to: {filepath}")
 
     @staticmethod
     def load(filename):
@@ -212,5 +208,5 @@ class ObservationCollectionScraper(ScrapeBase):
         """
         filepath = get_results_path(filename)
         df = pd.read_csv(filepath)
-        print(f"Loaded {len(df)} observations from: {filepath}")
+        logger.info(f"Loaded {len(df)} observations from: {filepath}")
         return df

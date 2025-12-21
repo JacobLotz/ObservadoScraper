@@ -1,4 +1,7 @@
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 
 def ensure_results_dir():
@@ -15,7 +18,7 @@ def ensure_results_dir():
     # Create directory if it doesn't exist
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
-        print(f"Created results directory: {results_dir}")
+        logger.info(f"Created results directory: {results_dir}")
 
     return results_dir
 
