@@ -77,3 +77,41 @@ test-all: test-unit
 	@echo "Unit tests complete. Starting integration tests..."
 	@echo ""
 	@$(MAKE) test-integration
+
+# Code style targets
+.PHONY: style style-check style-fix lint
+
+# Run all style checks
+style-check:
+	@echo "Checking code style..."
+	@echo ""
+	@echo "1. Checking import sorting with isort..."
+	conda run -n $(CONDA_ENV) isort --check-only --diff classes/ scripts/ tests/
+	@echo ""
+	@echo "2. Checking code formatting with black..."
+	conda run -n $(CONDA_ENV) black --check classes/ scripts/ tests/
+	@echo ""
+	@echo "3. Running linter with flake8..."
+	conda run -n $(CONDA_ENV) flake8 classes/ scripts/ tests/
+	@echo ""
+	@echo "All style checks passed!"
+
+# Fix code style automatically
+style-fix:
+	@echo "Fixing code style..."
+	@echo ""
+	@echo "1. Sorting imports with isort..."
+	conda run -n $(CONDA_ENV) isort classes/ scripts/ tests/
+	@echo ""
+	@echo "2. Formatting code with black..."
+	conda run -n $(CONDA_ENV) black classes/ scripts/ tests/
+	@echo ""
+	@echo "Code style fixed! Run 'make style-check' to verify."
+
+# Alias for style-fix
+style: style-fix
+
+# Run linter only
+lint:
+	@echo "Running flake8 linter..."
+	conda run -n $(CONDA_ENV) flake8 classes/ scripts/ tests/

@@ -1,7 +1,7 @@
-import datetime
 import calendar
+import datetime
 
-from classes import MigrationScraper, MigrationProcessor
+from classes import MigrationProcessor, MigrationScraper
 
 
 def GetMonthEnd(date_in_):

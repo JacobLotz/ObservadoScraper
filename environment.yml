@@ -1,6 +1,6 @@
-# Load with: 
+# Load with:
 #    conda env create -f environment.yml
-# Activate with: 
+# Activate with:
 #    conda activate observadoscraper
 
 name: observadoscraper
@@ -12,7 +12,12 @@ dependencies:
   - bs4
   - selenium
   - pytest
+  # Code style and formatting tools
+  - black
+  - isort
+  - flake8
   - pip
   - pip:
     - simplekml
     - webdriver_manager
+    - flake8-bugbear

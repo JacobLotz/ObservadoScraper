@@ -37,11 +37,14 @@ python -m scripts.getobservations
 # Or use Makefile
 make test              # Run unit tests
 make test-integration  # Run integration tests (slow)
-make test-all         # Run all tests
-make migtrend
-make ranking
-make observations
-make clean
+make test-all          # Run all tests
+make style             # Format code with black & isort
+make style-check       # Check code style compliance
+make lint              # Run flake8 linter
+make migtrend          # Generate migration trend plots
+make ranking           # Update self-find ranking
+make observations      # Scrape observations
+make clean             # Clean up cache files
 ```
 
 **Output Location**: All output files (CSV, KML, TXT, PNG) are saved to the `results/` directory, which is created automatically and git-ignored.
@@ -97,6 +100,52 @@ make test-all
 **CI Setup**: GitHub Actions workflow (`.github/workflows/python-tests.yml`) mocks passwords using `tests/mocks/passwords.py`. For local testing, create `passwords/passwords.py` based on `passwords/passwords-example.py`.
 
 **Note**: Only run unit tests in CI/automated environments. Integration tests require manual execution due to bot detection and potential observation changes on the website.
+
+## Code Style
+
+The project uses automated code formatting and linting tools to maintain consistent code style:
+
+### Tools
+
+- **black** - Automatic code formatter (line length: 100)
+- **isort** - Import statement organizer
+- **flake8** - Linter for code quality and style checking
+
+### Configuration Files
+
+- `pyproject.toml` - Black and isort settings
+- `.flake8` - Flake8 linting rules
+
+### Usage
+
+```bash
+# Check code style compliance (no changes)
+make style-check
+
+# Automatically fix code style issues
+make style
+# or: make style-fix
+
+# Run only linter (no automatic fixes)
+make lint
+```
+
+### Running Style Tools
+
+**Before committing code**, run:
+```bash
+make style        # Auto-format code with black & isort
+make style-check  # Verify compliance
+```
+
+### Style Rules
+
+- **Line length**: 100 characters max
+- **Import ordering**: Standard library → Third-party → First-party (classes, scripts, passwords)
+- **String quotes**: Double quotes preferred by black
+- **Trailing commas**: Required in multi-line structures
+
+The formatters run on `classes/`, `scripts/`, and `tests/` directories.
 
 ## Architecture
 

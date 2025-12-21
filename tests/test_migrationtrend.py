@@ -1,13 +1,15 @@
-import datetime
 import calendar
+import datetime
 
-from scripts.migrationtrendfun import GetMonthEnd, GetStartDates, GetEndDates
+from scripts.migrationtrendfun import GetEndDates, GetMonthEnd, GetStartDates
+
 
 def test_GetMonthEnd():
     assert GetMonthEnd(datetime.date(2024, 1, 15)) == 31
     assert GetMonthEnd(datetime.date(2024, 2, 1)) == 29  # Leap year
     assert GetMonthEnd(datetime.date(2023, 2, 1)) == 28
     assert GetMonthEnd(datetime.date(2024, 4, 1)) == 30
+
 
 def test_GetStartDates():
     result = GetStartDates(1, 1, 2024)
@@ -18,6 +20,7 @@ def test_GetStartDates():
     ]
     assert result == expected
 
+
 def test_GetEndDates():
     result = GetEndDates(1, 1, 2024)
     expected = [
@@ -26,4 +29,3 @@ def test_GetEndDates():
         datetime.date(2024, 1, 31),
     ]
     assert result == expected
-

@@ -17,10 +17,11 @@ import os
 import sys
 import time
 from unittest.mock import Mock
+
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -32,10 +33,10 @@ from classes.base import ScrapeBase
 def load_mock_html(filename):
     """Load mock HTML file and return BeautifulSoup object"""
     test_dir = os.path.dirname(__file__)
-    mock_file = os.path.join(test_dir, 'mocks', filename)
-    with open(mock_file, 'r', encoding='utf-8') as f:
+    mock_file = os.path.join(test_dir, "mocks", filename)
+    with open(mock_file, "r", encoding="utf-8") as f:
         html = f.read()
-    return BeautifulSoup(html, 'html.parser')
+    return BeautifulSoup(html, "html.parser")
 
 
 def verify_obscured_mock():
@@ -64,7 +65,11 @@ def verify_obscured_mock():
         try:
             # Wait for the language button and click it
             wait = WebDriverWait(base.browser, 10)
-            button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f"button[name='language'][value='{base.Lang}']")))
+            button = wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, f"button[name='language'][value='{base.Lang}']")
+                )
+            )
             button.click()
             time.sleep(2)
             print("   ✓ Language set to Dutch")
@@ -109,7 +114,7 @@ def verify_obscured_mock():
     print("\n2. Loading mock HTML...")
     # Scrape mock version
     mock_scraper = ObservationScraper(url, Mock())
-    mock_soup = load_mock_html('observation_373437223.html')
+    mock_soup = load_mock_html("observation_373437223.html")
     mock_scraper.PageSoup = mock_soup
     mock_scraper.GetSoup = Mock()
     mock_data = mock_scraper.scrape()
@@ -199,5 +204,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n✗ ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

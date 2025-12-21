@@ -1,5 +1,6 @@
 from .base import ScrapeBase
 
+
 # Scraper class for extracting data from a single observation page
 class ObservationScraper(ScrapeBase):
     """
@@ -26,7 +27,9 @@ class ObservationScraper(ScrapeBase):
 
         # Extract observation details table
         try:
-            infotable = self.PageSoup.find_all("table", {"class": "table table-condensed", "id": "observation_details"})
+            infotable = self.PageSoup.find_all(
+                "table", {"class": "table table-condensed", "id": "observation_details"}
+            )
             info = infotable[0].find_all("td")
             datetime_str = info[0].text.strip()
             location_name = info[4].text.strip()
@@ -34,12 +37,12 @@ class ObservationScraper(ScrapeBase):
             return None
 
         # Parse date/time
-        datetime_list = datetime_str.replace('-', ' ').split(' ')
+        datetime_list = datetime_str.replace("-", " ").split(" ")
         year = datetime_list[0]
         month = datetime_list[1]
         day = datetime_list[2]
         month_day = f"{datetime_list[2]}-{datetime_list[1]}"
-        time = datetime_list[3] if len(datetime_list) == 4 else '-'
+        time = datetime_list[3] if len(datetime_list) == 4 else "-"
 
         # Get GPS coordinates - skip if obscured
         location = self.PageSoup.find_all("span", {"class": "teramap-coordinates-coords"})
@@ -55,16 +58,16 @@ class ObservationScraper(ScrapeBase):
         description = description_elem.get_text() if description_elem else ""
 
         return {
-            'name': name,
-            'datetime': datetime_str,
-            'year': year,
-            'month': month,
-            'day': day,
-            'month_day': month_day,
-            'time': time,
-            'location_name': location_name,
-            'latitude': latitude,
-            'longitude': longitude,
-            'description': description,
-            'url': self.Link
+            "name": name,
+            "datetime": datetime_str,
+            "year": year,
+            "month": month,
+            "day": day,
+            "month_day": month_day,
+            "time": time,
+            "location_name": location_name,
+            "latitude": latitude,
+            "longitude": longitude,
+            "description": description,
+            "url": self.Link,
         }

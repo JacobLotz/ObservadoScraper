@@ -9,8 +9,8 @@ def ensure_results_dir():
         str: Path to the results directory
     """
     # Get the project root directory (parent of classes/)
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    results_dir = os.path.join(project_root, 'results')
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    results_dir = os.path.join(project_root, "results")
 
     # Create directory if it doesn't exist
     if not os.path.exists(results_dir):

@@ -1,7 +1,9 @@
-import pandas as pd
-import simplekml
 import json
 import os
+
+import pandas as pd
+import simplekml
+
 from .utils import get_results_path
 
 
@@ -28,14 +30,14 @@ class ObservationProcessor:
         Returns:
             New ObservationProcessor with filtered data
         """
-        selffind_keywords = ['Self', 'self', 'qwerty', 'Qwerty']
+        selffind_keywords = ["Self", "self", "qwerty", "Qwerty"]
 
         def is_selffind(description):
             if pd.isna(description) or description == "":
                 return False
             return any(keyword in str(description) for keyword in selffind_keywords)
 
-        filtered_df = self.df[self.df['description'].apply(is_selffind)].copy()
+        filtered_df = self.df[self.df["description"].apply(is_selffind)].copy()
         return ObservationProcessor(filtered_df)
 
     def assign_points(self, points_dict=None, points_file=None):
@@ -52,14 +54,14 @@ class ObservationProcessor:
         if points_dict is None:
             if points_file is None:
                 # Default to data/points.json
-                parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-                points_file = os.path.join(parent_dir, 'data/points.json')
+                parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+                points_file = os.path.join(parent_dir, "data/points.json")
 
             with open(points_file, "r") as f:
                 points_dict = json.load(f)
 
         # Assign points based on species name
-        self.df['points'] = self.df['name'].map(points_dict).fillna(0).astype(int)
+        self.df["points"] = self.df["name"].map(points_dict).fillna(0).astype(int)
 
         return self
 
@@ -70,10 +72,10 @@ class ObservationProcessor:
         Returns:
             Total points as integer
         """
-        if 'points' not in self.df.columns:
+        if "points" not in self.df.columns:
             raise ValueError("Points not assigned. Call assign_points() first.")
 
-        return int(self.df['points'].sum())
+        return int(self.df["points"].sum())
 
     def filter_by_species(self, species_list):
         """
@@ -85,7 +87,7 @@ class ObservationProcessor:
         Returns:
             New ObservationProcessor with filtered data
         """
-        filtered_df = self.df[self.df['name'].isin(species_list)].copy()
+        filtered_df = self.df[self.df["name"].isin(species_list)].copy()
         return ObservationProcessor(filtered_df)
 
     def sort_by_date(self, ascending=False):
@@ -98,7 +100,7 @@ class ObservationProcessor:
         Returns:
             self (for method chaining)
         """
-        self.df = self.df.sort_values('datetime', ascending=ascending)
+        self.df = self.df.sort_values("datetime", ascending=ascending)
         return self
 
     def to_kml(self, filename):
@@ -112,9 +114,9 @@ class ObservationProcessor:
 
         for _, row in self.df.iterrows():
             kml.newpoint(
-                name=row['name'],
-                coords=[(row['longitude'], row['latitude'])],
-                description=f"Date: {row['datetime']}"
+                name=row["name"],
+                coords=[(row["longitude"], row["latitude"])],
+                description=f"Date: {row['datetime']}",
             )
 
         filepath = get_results_path(filename)
@@ -130,24 +132,20 @@ class ObservationProcessor:
             title: Title for the report section
         """
         filepath = get_results_path(filename)
-        with open(filepath, 'a') as f:
-            f.write(f'\n{title}\n')
+        with open(filepath, "a") as f:
+            f.write(f"\n{title}\n")
 
             for _, row in self.df.iterrows():
-                points_str = f"{row['points']:>6}" if 'points' in self.df.columns else "     -"
-                line = '{:<27}{}{:<1}{:<10}{:<60}\n'.format(
-                    row['name'],
-                    points_str,
-                    " ",
-                    row['month_day'],
-                    row['location_name']
+                points_str = f"{row['points']:>6}" if "points" in self.df.columns else "     -"
+                line = "{:<27}{}{:<1}{:<10}{:<60}\n".format(
+                    row["name"], points_str, " ", row["month_day"], row["location_name"]
                 )
                 f.write(line)
 
-            if 'points' in self.df.columns:
+            if "points" in self.df.columns:
                 total = self.calculate_total_points()
-                f.write('\n')
-                f.write('{:<27}{:>6}\n'.format("Totaal: ", total))
+                f.write("\n")
+                f.write("{:<27}{:>6}\n".format("Totaal: ", total))
 
         print(f"Appended report to: {filepath}")
 
@@ -168,12 +166,12 @@ class ObservationProcessor:
             Dictionary with summary information
         """
         summary = {
-            'total_observations': len(self.df),
-            'unique_species': self.df['name'].nunique(),
-            'species_list': sorted(self.df['name'].unique().tolist())
+            "total_observations": len(self.df),
+            "unique_species": self.df["name"].nunique(),
+            "species_list": sorted(self.df["name"].unique().tolist()),
         }
 
-        if 'points' in self.df.columns:
-            summary['total_points'] = self.calculate_total_points()
+        if "points" in self.df.columns:
+            summary["total_points"] = self.calculate_total_points()
 
         return summary

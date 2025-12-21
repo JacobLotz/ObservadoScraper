@@ -1,7 +1,8 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
+
 from .utils import get_results_path
 
 
@@ -23,7 +24,7 @@ class MigrationProcessor:
     def _divide_chunks(self, lst, n):
         """Divide list into chunks of size n"""
         for i in range(0, len(lst), n):
-            yield lst[i:i + n]
+            yield lst[i : i + n]
 
     def plot_species_trend(self, species_name, month_start=1, month_end=12, output_file=None):
         """
@@ -43,21 +44,56 @@ class MigrationProcessor:
             return None
 
         # Extract years from dates
-        self.df['year'] = pd.to_datetime(self.df['start_date']).dt.year
-        years = sorted(self.df['year'].unique())
+        self.df["year"] = pd.to_datetime(self.df["start_date"]).dt.year
+        years = sorted(self.df["year"].unique())
         n_years = len(years)
 
         # Create x-axis labels (3 periods per month)
-        x_axis = ["Jan", " ", " ", "Feb", " ", " ", "Maa", " ", " ", "Apr", " ", " ",
-                  "Mei", " ", " ", "Jun", " ", " ", "Jul", " ", " ", "Aug", " ", " ",
-                  "Sep", " ", " ", "Okt", " ", " ", "Nov", " ", " ", "Dec", " ", " "]
+        x_axis = [
+            "Jan",
+            " ",
+            " ",
+            "Feb",
+            " ",
+            " ",
+            "Maa",
+            " ",
+            " ",
+            "Apr",
+            " ",
+            " ",
+            "Mei",
+            " ",
+            " ",
+            "Jun",
+            " ",
+            " ",
+            "Jul",
+            " ",
+            " ",
+            "Aug",
+            " ",
+            " ",
+            "Sep",
+            " ",
+            " ",
+            "Okt",
+            " ",
+            " ",
+            "Nov",
+            " ",
+            " ",
+            "Dec",
+            " ",
+            " ",
+        ]
 
         # Filter to requested months
-        x_axis = x_axis[(month_start - 1) * 3:(month_end * 3)]
+        x_axis = x_axis[(month_start - 1) * 3 : (month_end * 3)]
         X_axis = np.arange(len(x_axis))
 
         # Get n_squares data and divide by year
-        y = self.df['n_squares'].tolist()
+        y = self.df["n_squares"].tolist()
         yy = list(self._divide_chunks(y, len(x_axis)))
 
         # Compute mean (excluding last year from average)
@@ -75,7 +111,7 @@ class MigrationProcessor:
 
         # Plot each year
         for yyy, year in zip(yy, years):
-            plt.plot(X_axis + 0.5, yyy, label=str(year), alpha=0.5, linestyle='dashed')
+            plt.plot(X_axis + 0.5, yyy, label=str(year), alpha=0.5, linestyle="dashed")
 
         # Plot mean
         if len(yy_mean) > 0:
@@ -93,7 +129,9 @@ class MigrationProcessor:
 
         # Save plot
         if output_file is None:
-            species_id = self.df['species_id'].iloc[0] if 'species_id' in self.df.columns else "unknown"
+            species_id = (
+                self.df["species_id"].iloc[0] if "species_id" in self.df.columns else "unknown"
+            )
             output_file = f"{species_id}-{species_name.replace(' ', '_')}.png"
 
         filepath = get_results_path(output_file)
@@ -120,13 +158,10 @@ class MigrationProcessor:
             Dictionary with summary information
         """
         summary = {
-            'total_data_points': len(self.df),
-            'date_range': {
-                'start': self.df['start_date'].min(),
-                'end': self.df['end_date'].max()
-            },
-            'max_squares': int(self.df['n_squares'].max()),
-            'mean_squares': float(self.df['n_squares'].mean())
+            "total_data_points": len(self.df),
+            "date_range": {"start": self.df["start_date"].min(), "end": self.df["end_date"].max()},
+            "max_squares": int(self.df["n_squares"].max()),
+            "mean_squares": float(self.df["n_squares"].mean()),
         }
 
         return summary

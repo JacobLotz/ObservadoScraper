@@ -1,10 +1,11 @@
 import re
+
 import pandas as pd
 from bs4 import BeautifulSoup as soup
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 from .base import ScrapeBase
 from .utils import get_results_path
@@ -36,14 +37,25 @@ class MigrationScraper(ScrapeBase):
             wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".leaflet-tile-loaded")))
 
             # Wait for the map overlay SVG to be present (the grid data)
-            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".leaflet-overlay-pane svg")))
+            wait.until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".leaflet-overlay-pane svg"))
+            )
 
             # Wait for the grid cells to be rendered
-            wait.until(lambda d: len(d.find_elements(By.CSS_SELECTOR,
-                ".leaflet-overlay-pane svg path, .leaflet-overlay-pane svg rect, .leaflet-overlay-pane svg polygon")) > 10)
+            wait.until(
+                lambda d: len(
+                    d.find_elements(
+                        By.CSS_SELECTOR,
+                        ".leaflet-overlay-pane svg path, .leaflet-overlay-pane svg rect, .leaflet-overlay-pane svg polygon",
+                    )
+                )
+                > 10
+            )
 
             # Wait for the legend panel to appear
-            wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".panel-body.map-legend")))
+            wait.until(
+                EC.visibility_of_element_located((By.CSS_SELECTOR, ".panel-body.map-legend"))
+            )
 
         except Exception as e:
             print("Timed out waiting for map to load.")
@@ -66,7 +78,7 @@ class MigrationScraper(ScrapeBase):
             return 0
 
         text = element.text
-        numbers = re.findall(r'\d+', text)
+        numbers = re.findall(r"\d+", text)
 
         if len(numbers) >= 2:
             return int(numbers[1])
@@ -85,10 +97,12 @@ class MigrationScraper(ScrapeBase):
         Returns:
             Dictionary with date and square count
         """
-        link = (f"https://waarneming.nl/species/{species_id}/maps/"
-                f"?start_date={start_date.strftime('%Y-%m-%d')}"
-                f"&end_date={end_date.strftime('%Y-%m-%d')}"
-                f"&map_type=grid1k")
+        link = (
+            f"https://waarneming.nl/species/{species_id}/maps/"
+            f"?start_date={start_date.strftime('%Y-%m-%d')}"
+            f"&end_date={end_date.strftime('%Y-%m-%d')}"
+            f"&map_type=grid1k"
+        )
 
         self.UpdateLink(link)
         self._get_soup_with_wait()
@@ -97,10 +111,10 @@ class MigrationScraper(ScrapeBase):
         print(f"{start_date}, {n_squares} squares")
 
         return {
-            'start_date': start_date,
-            'end_date': end_date,
-            'n_squares': n_squares,
-            'species_id': species_id
+            "start_date": start_date,
+            "end_date": end_date,
+            "n_squares": n_squares,
+            "species_id": species_id,
         }
 
     def scrape_date_ranges(self, species_id, date_ranges):
@@ -152,7 +166,7 @@ class MigrationScraper(ScrapeBase):
         filepath = get_results_path(filename)
         df = pd.read_csv(filepath)
         # Convert date strings back to datetime
-        df['start_date'] = pd.to_datetime(df['start_date'])
-        df['end_date'] = pd.to_datetime(df['end_date'])
+        df["start_date"] = pd.to_datetime(df["start_date"])
+        df["end_date"] = pd.to_datetime(df["end_date"])
         print(f"Loaded {len(df)} migration data points from: {filepath}")
         return df
