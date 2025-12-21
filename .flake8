@@ -1,0 +1,59 @@
+[flake8]
+# Configuration for flake8 linting
+
+# Maximum line length (matches black)
+max-line-length = 100
+
+# Exclude directories
+exclude =
+    .git,
+    __pycache__,
+    .pytest_cache,
+    .eggs,
+    *.egg-info,
+    build,
+    dist,
+    results,
+    .venv,
+    venv
+
+# Ignore specific error codes
+ignore =
+    E203,
+    E226,
+    E266,
+    E402,
+    E501,
+    E722,
+    F401,
+    F403,
+    F405,
+    F541,
+    F841,
+    W503,
+    W504,
+    B001,
+    B950,
+    N802,
+    N803,
+    N806,
+    N812,
+    N813
+
+# Enable specific checks
+select = C,E,F,W,B,B950,N
+
+# Maximum complexity
+max-complexity = 15
+
+# Naming conventions (enforce snake_case)
+# N801: class name should use CapWords convention
+# N802: function name should be lowercase
+# N803: argument name should be lowercase
+# N806: variable should be lowercase
+
+# Show source code for errors
+show-source = True
+
+# Count errors
+count = True

@@ -1,4 +1,7 @@
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 
 def ensure_results_dir():
@@ -9,13 +12,13 @@ def ensure_results_dir():
         str: Path to the results directory
     """
     # Get the project root directory (parent of classes/)
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    results_dir = os.path.join(project_root, 'results')
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    results_dir = os.path.join(project_root, "results")
 
     # Create directory if it doesn't exist
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
-        print(f"Created results directory: {results_dir}")
+        logger.info(f"Created results directory: {results_dir}")
 
     return results_dir
 

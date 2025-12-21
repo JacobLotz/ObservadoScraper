@@ -1,14 +1,17 @@
-import datetime
 import calendar
+import datetime
+import logging
 
-from classes import MigrationScraper, MigrationProcessor
+from classes import MigrationProcessor, MigrationScraper
+
+logger = logging.getLogger(__name__)
 
 
-def GetMonthEnd(date_in_):
+def get_month_end(date_in_):
     return calendar.monthrange(date_in_.year, date_in_.month)[1]
 
 
-def GetStartDates(month_start_, month_end_, year_):
+def get_start_dates(month_start_, month_end_, year_):
     start_dates = []
     month = month_start_
 
@@ -22,13 +25,13 @@ def GetStartDates(month_start_, month_end_, year_):
     return start_dates
 
 
-def GetEndDates(month_start_, month_end_, year_):
+def get_end_dates(month_start_, month_end_, year_):
     end_dates = []
     month = month_start_
 
     while month != month_end_ + 1:
         date = datetime.date(year_, month, 1)
-        end = GetMonthEnd(date)
+        end = get_month_end(date)
         end_dates.append(datetime.date(year_, month, 11))
         end_dates.append(datetime.date(year_, month, 21))
         end_dates.append(datetime.date(year_, month, end))
@@ -37,7 +40,7 @@ def GetEndDates(month_start_, month_end_, year_):
     return end_dates
 
 
-def GetSpeciesPlot(year_start, year_end, month_start, month_end, species_id, name):
+def get_species_plot(year_start, year_end, month_start, month_end, species_id, name):
     """
     Scrape migration trend data and create plot for a species.
 
@@ -56,15 +59,15 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, species_id, nam
         species_id: Species ID for waarneming.nl
         name: Species name for plot title
     """
-    print(f"Working on: {name}")
+    logger.info(f"Working on: {name}")
 
     # Generate date bins
     years_range = range(year_start, year_end + 1, 1)
     date_ranges = []
 
     for year in years_range:
-        bins_start = GetStartDates(month_start, month_end, year)
-        bins_end = GetEndDates(month_start, month_end, year)
+        bins_start = get_start_dates(month_start, month_end, year)
+        bins_end = get_end_dates(month_start, month_end, year)
 
         for start, end in zip(bins_start, bins_end):
             date_ranges.append((start, end))
@@ -81,5 +84,5 @@ def GetSpeciesPlot(year_start, year_end, month_start, month_end, species_id, nam
     processor = MigrationProcessor(df)
     plot_file = processor.plot_species_trend(name, month_start, month_end)
 
-    print(f"Completed: {name}")
+    logger.info(f"Completed: {name}")
     return plot_file

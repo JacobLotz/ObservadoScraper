@@ -21,10 +21,11 @@ import os
 import sys
 import time
 from unittest.mock import Mock
+
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -36,10 +37,10 @@ from classes.base import ScrapeBase
 def load_mock_html(filename):
     """Load mock HTML file and return BeautifulSoup object"""
     test_dir = os.path.dirname(__file__)
-    mock_file = os.path.join(test_dir, 'mocks', filename)
-    with open(mock_file, 'r', encoding='utf-8') as f:
+    mock_file = os.path.join(test_dir, "mocks", filename)
+    with open(mock_file, "r", encoding="utf-8") as f:
         html = f.read()
-    return BeautifulSoup(html, 'html.parser')
+    return BeautifulSoup(html, "html.parser")
 
 
 def verify_mock():
@@ -55,7 +56,7 @@ def verify_mock():
 
     # Create a real browser instance
     base = ScrapeBase(url)
-    base.CreateWebDriver()
+    base.create_web_driver()
 
     try:
         # Set language to Dutch first
@@ -66,7 +67,11 @@ def verify_mock():
         try:
             # Wait for the language button and click it
             wait = WebDriverWait(base.browser, 10)
-            button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f"button[name='language'][value='{base.Lang}']")))
+            button = wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, f"button[name='language'][value='{base.lang}']")
+                )
+            )
             button.click()
             time.sleep(2)  # Wait for language change to take effect
             print("   ✓ Language set to Dutch")
@@ -121,9 +126,9 @@ def verify_mock():
         print("\n2. Loading mock HTML...")
         # Scrape mock version
         mock_scraper = ObservationScraper(url, Mock())
-        mock_soup = load_mock_html('observation_page.html')
-        mock_scraper.PageSoup = mock_soup
-        mock_scraper.GetSoup = Mock()
+        mock_soup = load_mock_html("observation_page.html")
+        mock_scraper.page_soup = mock_soup
+        mock_scraper.get_soup = Mock()
         mock_data = mock_scraper.scrape()
 
         if mock_data is None:
@@ -139,14 +144,14 @@ def verify_mock():
 
         # Compare key fields
         fields_to_compare = [
-            ('name', 'Species name'),
-            ('year', 'Year'),
-            ('month', 'Month'),
-            ('day', 'Day'),
-            ('time', 'Time'),
-            ('location_name', 'Location'),
-            ('latitude', 'Latitude'),
-            ('longitude', 'Longitude'),
+            ("name", "Species name"),
+            ("year", "Year"),
+            ("month", "Month"),
+            ("day", "Day"),
+            ("time", "Time"),
+            ("location_name", "Location"),
+            ("latitude", "Latitude"),
+            ("longitude", "Longitude"),
         ]
 
         for field, label in fields_to_compare:
@@ -160,11 +165,17 @@ def verify_mock():
                 mismatches.append((label, real_val, mock_val))
 
         # Check description exists in both (content may vary)
-        if 'description' in real_data and 'description' in mock_data:
-            print(f"   ✓ Description: Both present (lengths: real={len(real_data['description'])}, mock={len(mock_data['description'])})")
+        if "description" in real_data and "description" in mock_data:
+            print(
+                f"   ✓ Description: Both present (lengths: real={len(real_data['description'])}, mock={len(mock_data['description'])})"
+            )
         else:
-            print(f"   ✗ Description: Missing in {'real' if 'description' not in real_data else 'mock'}")
-            mismatches.append(('Description', 'description' in real_data, 'description' in mock_data))
+            print(
+                f"   ✗ Description: Missing in {'real' if 'description' not in real_data else 'mock'}"
+            )
+            mismatches.append(
+                ("Description", "description" in real_data, "description" in mock_data)
+            )
 
         # Summary
         print(f"\n{'-'*70}")
@@ -191,7 +202,7 @@ def verify_mock():
     finally:
         # Clean up browser
         print("\n4. Cleaning up...")
-        base.CloseWebDriver()
+        base.close_web_driver()
         print("   ✓ Browser closed")
         print()
 
@@ -203,5 +214,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n✗ ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

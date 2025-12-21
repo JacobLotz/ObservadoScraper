@@ -16,13 +16,14 @@ Or as a module:
 """
 
 import os
-import sys
 import re
+import sys
 import time
+
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -33,17 +34,17 @@ from classes.base import ScrapeBase
 def load_mock_html(filename):
     """Load mock HTML file and return BeautifulSoup object"""
     test_dir = os.path.dirname(__file__)
-    mock_file = os.path.join(test_dir, 'mocks', filename)
-    with open(mock_file, 'r', encoding='utf-8') as f:
+    mock_file = os.path.join(test_dir, "mocks", filename)
+    with open(mock_file, "r", encoding="utf-8") as f:
         html = f.read()
-    return BeautifulSoup(html, 'html.parser')
+    return BeautifulSoup(html, "html.parser")
 
 
 def extract_observation_links(soup):
     """Extract observation links using the same pattern as scraper"""
     links = []
-    for link in soup.findAll('a', attrs={'href': re.compile("^/observation/")}):
-        links.append(link.get('href'))
+    for link in soup.findAll("a", attrs={"href": re.compile("^/observation/")}):
+        links.append(link.get("href"))
     return links
 
 
@@ -62,7 +63,7 @@ def verify_list_mock():
 
     # Create a real browser instance
     base = ScrapeBase(url)
-    base.CreateWebDriver()
+    base.create_web_driver()
 
     try:
         # Set language to Dutch first
@@ -73,7 +74,11 @@ def verify_list_mock():
         try:
             # Wait for the language button and click it
             wait = WebDriverWait(base.browser, 10)
-            button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f"button[name='language'][value='{base.Lang}']")))
+            button = wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, f"button[name='language'][value='{base.lang}']")
+                )
+            )
             button.click()
             time.sleep(2)
             print("   ✓ Language set to Dutch")
@@ -99,7 +104,7 @@ def verify_list_mock():
 
         # Parse the real page
         print("   • Extracting observation links from real page...")
-        real_soup = BeautifulSoup(page_source, 'html.parser')
+        real_soup = BeautifulSoup(page_source, "html.parser")
         real_links = extract_observation_links(real_soup)
 
         if not real_links:
@@ -111,10 +116,10 @@ def verify_list_mock():
 
     finally:
         # Clean up browser
-        base.CloseWebDriver()
+        base.close_web_driver()
 
     print("\n2. Loading mock HTML...")
-    mock_soup = load_mock_html('observations_list_page.html')
+    mock_soup = load_mock_html("observations_list_page.html")
     mock_links = extract_observation_links(mock_soup)
     print(f"   ✓ Found {len(mock_links)} observation link(s) in mock")
 
@@ -145,10 +150,14 @@ def verify_list_mock():
     # (Real page may have more observations than mock)
     found_in_real = [link for link in expected_links if link in real_links]
     if len(found_in_real) >= 3:  # Allow some flexibility
-        print(f"   ✓ Real page contains {len(found_in_real)}/{len(expected_links)} expected observations")
+        print(
+            f"   ✓ Real page contains {len(found_in_real)}/{len(expected_links)} expected observations"
+        )
         checks.append(True)
     else:
-        print(f"   ⚠ Real page only contains {len(found_in_real)}/{len(expected_links)} expected observations")
+        print(
+            f"   ⚠ Real page only contains {len(found_in_real)}/{len(expected_links)} expected observations"
+        )
         print(f"     This may indicate the observations have changed on the website")
         checks.append(False)
 
@@ -208,5 +217,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n✗ ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

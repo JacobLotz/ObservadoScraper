@@ -1,9 +1,9 @@
 import os
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock
+
 from bs4 import BeautifulSoup
+
 from classes import ObservationScraper
-from classes.base import ScrapeBase
 
 
 class TestObservationScraper:
@@ -15,10 +15,10 @@ class TestObservationScraper:
 
     def _load_mock_html(self, filename):
         """Load mock HTML file and return BeautifulSoup object"""
-        mock_file = os.path.join(self.test_dir, 'mocks', filename)
-        with open(mock_file, 'r', encoding='utf-8') as f:
+        mock_file = os.path.join(self.test_dir, "mocks", filename)
+        with open(mock_file, "r", encoding="utf-8") as f:
             html = f.read()
-        return BeautifulSoup(html, 'html.parser')
+        return BeautifulSoup(html, "html.parser")
 
     def test_scrape_normal_observation(self):
         """Test scraping a normal observation with GPS coordinates"""
@@ -29,27 +29,27 @@ class TestObservationScraper:
         scraper = ObservationScraper("https://waarneming.nl/observation/382543115/", mock_browser)
 
         # Mock the GetSoup method to use our HTML mock
-        mock_soup = self._load_mock_html('observation_page.html')
-        scraper.PageSoup = mock_soup
+        mock_soup = self._load_mock_html("observation_page.html")
+        scraper.page_soup = mock_soup
 
         # Scrape without calling GetSoup (which would use Selenium)
-        scraper.GetSoup = Mock()  # Mock out GetSoup
+        scraper.get_soup = Mock()  # Mock out GetSoup
         result = scraper.scrape()
 
         # Verify results
         assert result is not None
-        assert result['name'] == 'Gewone Zeehond'
-        assert result['year'] == '2025'
-        assert result['month'] == '12'
-        assert result['day'] == '14'
-        assert result['time'] == '-'
-        assert result['month_day'] == '14-12'
-        assert result['datetime'] == '2025-12-14'
-        assert result['location_name'] == 'Ter Heijde - Zandmotor (ZH)'
-        assert result['latitude'] == '52.05759'
-        assert result['longitude'] == '4.19180'
-        assert 'Self found' in result['description']
-        assert result['url'] == 'https://waarneming.nl/observation/382543115/'
+        assert result["name"] == "Gewone Zeehond"
+        assert result["year"] == "2025"
+        assert result["month"] == "12"
+        assert result["day"] == "14"
+        assert result["time"] == "-"
+        assert result["month_day"] == "14-12"
+        assert result["datetime"] == "2025-12-14"
+        assert result["location_name"] == "Ter Heijde - Zandmotor (ZH)"
+        assert result["latitude"] == "52.05759"
+        assert result["longitude"] == "4.19180"
+        assert "Self found" in result["description"]
+        assert result["url"] == "https://waarneming.nl/observation/382543115/"
 
     def test_scrape_selffind_observation_257848200(self):
         """Test scraping observation 257848200 - Vale Gierzwaluw with self-find marker"""
@@ -57,26 +57,26 @@ class TestObservationScraper:
         scraper = ObservationScraper("https://waarneming.nl/observation/257848200/", mock_browser)
 
         # Mock the GetSoup method to use our HTML mock
-        mock_soup = self._load_mock_html('observation_257848200.html')
-        scraper.PageSoup = mock_soup
-        scraper.GetSoup = Mock()
+        mock_soup = self._load_mock_html("observation_257848200.html")
+        scraper.page_soup = mock_soup
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
         # Verify results
         assert result is not None
-        assert result['name'] == 'Vale Gierzwaluw'
-        assert result['year'] == '2022'
-        assert result['month'] == '10'
-        assert result['day'] == '23'
-        assert result['time'] == '-'
-        assert result['month_day'] == '23-10'
-        assert result['datetime'] == '2022-10-23'
-        assert result['location_name'] == 'Maasvlakte 2 (ZH)'
-        assert result['latitude'] == '51.95211'
-        assert result['longitude'] == '3.96657'
-        assert 'self' in result['description']
-        assert result['url'] == 'https://waarneming.nl/observation/257848200/'
+        assert result["name"] == "Vale Gierzwaluw"
+        assert result["year"] == "2022"
+        assert result["month"] == "10"
+        assert result["day"] == "23"
+        assert result["time"] == "-"
+        assert result["month_day"] == "23-10"
+        assert result["datetime"] == "2022-10-23"
+        assert result["location_name"] == "Maasvlakte 2 (ZH)"
+        assert result["latitude"] == "51.95211"
+        assert result["longitude"] == "3.96657"
+        assert "self" in result["description"]
+        assert result["url"] == "https://waarneming.nl/observation/257848200/"
 
     def test_scrape_obscured_observation(self):
         """Test scraping an observation with obscured GPS coordinates"""
@@ -84,9 +84,9 @@ class TestObservationScraper:
         scraper = ObservationScraper("https://waarneming.nl/observation/999999/", mock_browser)
 
         # Mock the GetSoup method
-        mock_soup = self._load_mock_html('observation_page_obscured.html')
-        scraper.PageSoup = mock_soup
-        scraper.GetSoup = Mock()
+        mock_soup = self._load_mock_html("observation_page_obscured.html")
+        scraper.page_soup = mock_soup
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
@@ -121,14 +121,14 @@ class TestObservationScraper:
         </html>
         """
 
-        scraper.PageSoup = BeautifulSoup(html, 'html.parser')
-        scraper.GetSoup = Mock()
+        scraper.page_soup = BeautifulSoup(html, "html.parser")
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
         assert result is not None
-        assert result['time'] == '-'
-        assert result['datetime'] == '2025-06-15'
+        assert result["time"] == "-"
+        assert result["datetime"] == "2025-06-15"
 
     def test_scrape_with_empty_description(self):
         """Test scraping observation without description"""
@@ -157,13 +157,13 @@ class TestObservationScraper:
         </html>
         """
 
-        scraper.PageSoup = BeautifulSoup(html, 'html.parser')
-        scraper.GetSoup = Mock()
+        scraper.page_soup = BeautifulSoup(html, "html.parser")
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
         assert result is not None
-        assert result['description'] == ''
+        assert result["description"] == ""
 
     def test_scrape_malformed_page(self):
         """Test scraping a page with missing required elements"""
@@ -179,8 +179,8 @@ class TestObservationScraper:
         </html>
         """
 
-        scraper.PageSoup = BeautifulSoup(html, 'html.parser')
-        scraper.GetSoup = Mock()
+        scraper.page_soup = BeautifulSoup(html, "html.parser")
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
@@ -222,14 +222,14 @@ class TestObservationScraper:
             </html>
             """
 
-            scraper.PageSoup = BeautifulSoup(html, 'html.parser')
-            scraper.GetSoup = Mock()
+            scraper.page_soup = BeautifulSoup(html, "html.parser")
+            scraper.get_soup = Mock()
 
             result = scraper.scrape()
 
             assert result is not None, f"Failed for datetime: {datetime_str}"
-            assert result['year'] == exp_year
-            assert result['month'] == exp_month
-            assert result['day'] == exp_day
-            assert result['time'] == exp_time
-            assert result['month_day'] == exp_month_day
+            assert result["year"] == exp_year
+            assert result["month"] == exp_month
+            assert result["day"] == exp_day
+            assert result["time"] == exp_time
+            assert result["month_day"] == exp_month_day

@@ -1,8 +1,10 @@
-import pandas as pd
+import json
 import os
 import tempfile
-import json
-from classes import ObservationProcessor, ObservationCollectionScraper
+
+import pandas as pd
+
+from classes import ObservationCollectionScraper, ObservationProcessor
 
 
 class TestObservationProcessor:
@@ -13,14 +15,14 @@ class TestObservationProcessor:
 
         # Load mock data
         test_dir = os.path.dirname(__file__)
-        mock_file = os.path.join(test_dir, 'mocks', 'observations_mock.csv')
+        mock_file = os.path.join(test_dir, "mocks", "observations_mock.csv")
         self.df = pd.read_csv(mock_file)
         self.processor = ObservationProcessor(self.df)
 
     def test_initialization(self):
         """Test that processor initializes with DataFrame"""
         assert len(self.processor.get_dataframe()) == 5
-        assert 'name' in self.processor.get_dataframe().columns
+        assert "name" in self.processor.get_dataframe().columns
 
     def test_filter_selffinds(self):
         """Test filtering for self-finds"""
@@ -31,30 +33,32 @@ class TestObservationProcessor:
         assert len(df_result) == 3
 
         # Check that correct observations are included
-        names = df_result['name'].tolist()
-        assert 'Boswitje' in names  # "Self found"
-        assert 'Staartblauwtje' in names  # "qwerty"
-        assert 'Sleedoornpage' in names  # "Self observed"
+        names = df_result["name"].tolist()
+        assert "Boswitje" in names  # "Self found"
+        assert "Staartblauwtje" in names  # "qwerty"
+        assert "Sleedoornpage" in names  # "Self observed"
 
         # Check that non-selffind is excluded
-        assert 'Kaasjeskruiddikkopje' not in names
+        assert "Kaasjeskruiddikkopje" not in names
 
     def test_filter_selffinds_observation_257848200(self):
         """Test that observation 257848200 is correctly identified as self-find"""
         # Create DataFrame with observation 257848200 data
         data = {
-            'name': ['Vale Gierzwaluw'],
-            'datetime': ['2022-10-23 12:20'],
-            'year': ['2022'],
-            'month': ['10'],
-            'day': ['23'],
-            'month_day': ['23-10'],
-            'time': ['12:20'],
-            'location_name': ['Maasvlakte 2 (ZH)'],
-            'latitude': ['51.95211'],
-            'longitude': ['3.96657'],
-            'description': ['Yihaa!! Met Daan eerst vanuit de auto. Snel gekeerd en plaatjes gemaakt vanuit de auto. Gelukkig konden we de auto snel kwijt op een vluchthaven waarna ze snel weer dichterbij kwamen. Ze bleken redelijk honkvast en kwamen elke keer weer terug naar deze locatie. Af en toe op 2 meter langs... self'],
-            'url': ['https://waarneming.nl/observation/257848200/']
+            "name": ["Vale Gierzwaluw"],
+            "datetime": ["2022-10-23 12:20"],
+            "year": ["2022"],
+            "month": ["10"],
+            "day": ["23"],
+            "month_day": ["23-10"],
+            "time": ["12:20"],
+            "location_name": ["Maasvlakte 2 (ZH)"],
+            "latitude": ["51.95211"],
+            "longitude": ["3.96657"],
+            "description": [
+                "Yihaa!! Met Daan eerst vanuit de auto. Snel gekeerd en plaatjes gemaakt vanuit de auto. Gelukkig konden we de auto snel kwijt op een vluchthaven waarna ze snel weer dichterbij kwamen. Ze bleken redelijk honkvast en kwamen elke keer weer terug naar deze locatie. Af en toe op 2 meter langs... self"
+            ],
+            "url": ["https://waarneming.nl/observation/257848200/"],
         }
         df = pd.DataFrame(data)
         processor = ObservationProcessor(df)
@@ -65,21 +69,21 @@ class TestObservationProcessor:
 
         # Should find 1 self-find (description ends with "self")
         assert len(df_result) == 1
-        assert df_result['name'].iloc[0] == 'Vale Gierzwaluw'
-        assert 'self' in df_result['description'].iloc[0]
+        assert df_result["name"].iloc[0] == "Vale Gierzwaluw"
+        assert "self" in df_result["description"].iloc[0]
 
     def test_assign_points(self):
         """Test assigning points to observations"""
         # Create temporary points file
         points_dict = {
-            'Boswitje': 10,
-            'Kleine Weerschijnvlinder': 5,
-            'Staartblauwtje': 15,
-            'Kaasjeskruiddikkopje': 8,
-            'Sleedoornpage': 12
+            "Boswitje": 10,
+            "Kleine Weerschijnvlinder": 5,
+            "Staartblauwtje": 15,
+            "Kaasjeskruiddikkopje": 8,
+            "Sleedoornpage": 12,
         }
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(points_dict, f)
             temp_points_file = f.name
 
@@ -87,20 +91,20 @@ class TestObservationProcessor:
             self.processor.assign_points(points_file=temp_points_file)
             df = self.processor.get_dataframe()
 
-            assert 'points' in df.columns
-            assert df[df['name'] == 'Boswitje']['points'].iloc[0] == 10
-            assert df[df['name'] == 'Staartblauwtje']['points'].iloc[0] == 15
+            assert "points" in df.columns
+            assert df[df["name"] == "Boswitje"]["points"].iloc[0] == 10
+            assert df[df["name"] == "Staartblauwtje"]["points"].iloc[0] == 15
         finally:
             os.unlink(temp_points_file)
 
     def test_calculate_total_points(self):
         """Test calculating total points"""
         points_dict = {
-            'Boswitje': 10,
-            'Kleine Weerschijnvlinder': 5,
-            'Staartblauwtje': 15,
-            'Kaasjeskruiddikkopje': 8,
-            'Sleedoornpage': 12
+            "Boswitje": 10,
+            "Kleine Weerschijnvlinder": 5,
+            "Staartblauwtje": 15,
+            "Kaasjeskruiddikkopje": 8,
+            "Sleedoornpage": 12,
         }
 
         self.processor.assign_points(points_dict=points_dict)
@@ -111,12 +115,12 @@ class TestObservationProcessor:
 
     def test_filter_by_species(self):
         """Test filtering by species names"""
-        species_to_keep = ['Boswitje', 'Staartblauwtje']
+        species_to_keep = ["Boswitje", "Staartblauwtje"]
         filtered = self.processor.filter_by_species(species_to_keep)
         df_result = filtered.get_dataframe()
 
         assert len(df_result) == 2
-        assert set(df_result['name'].tolist()) == set(species_to_keep)
+        assert set(df_result["name"].tolist()) == set(species_to_keep)
 
     def test_sort_by_date(self):
         """Test sorting by date"""
@@ -124,12 +128,12 @@ class TestObservationProcessor:
         df = self.processor.get_dataframe()
 
         # Check that dates are in ascending order
-        dates = df['datetime'].tolist()
+        dates = df["datetime"].tolist()
         assert dates == sorted(dates)
 
     def test_to_kml(self):
         """Test KML export"""
-        with tempfile.NamedTemporaryFile(suffix='.kml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix=".kml", delete=False) as f:
             temp_kml = f.name
 
         try:
@@ -142,20 +146,20 @@ class TestObservationProcessor:
 
     def test_to_text_report(self):
         """Test text report generation"""
-        points_dict = {'Boswitje': 10, 'Kleine Weerschijnvlinder': 5}
+        points_dict = {"Boswitje": 10, "Kleine Weerschijnvlinder": 5}
         self.processor.assign_points(points_dict=points_dict)
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             temp_report = f.name
 
         try:
             self.processor.to_text_report(temp_report, title="Test Report")
             assert os.path.exists(temp_report)
 
-            with open(temp_report, 'r') as f:
+            with open(temp_report, "r") as f:
                 content = f.read()
-                assert 'Test Report' in content
-                assert 'Boswitje' in content
+                assert "Test Report" in content
+                assert "Boswitje" in content
         finally:
             if os.path.exists(temp_report):
                 os.unlink(temp_report)
@@ -164,31 +168,28 @@ class TestObservationProcessor:
         """Test summary statistics"""
         summary = self.processor.get_summary()
 
-        assert summary['total_observations'] == 5
-        assert summary['unique_species'] == 5
-        assert 'Boswitje' in summary['species_list']
+        assert summary["total_observations"] == 5
+        assert summary["unique_species"] == 5
+        assert "Boswitje" in summary["species_list"]
 
     def test_get_summary_with_points(self):
         """Test summary with points assigned"""
-        points_dict = {'Boswitje': 10, 'Kleine Weerschijnvlinder': 5}
+        points_dict = {"Boswitje": 10, "Kleine Weerschijnvlinder": 5}
         self.processor.assign_points(points_dict=points_dict)
 
         summary = self.processor.get_summary()
-        assert 'total_points' in summary
+        assert "total_points" in summary
 
     def test_chained_operations(self):
         """Test chaining multiple operations"""
-        points_dict = {
-            'Boswitje': 10,
-            'Staartblauwtje': 15,
-            'Sleedoornpage': 12
-        }
+        points_dict = {"Boswitje": 10, "Staartblauwtje": 15, "Sleedoornpage": 12}
 
         # Chain: filter selffinds -> assign points -> sort
-        result = (self.processor
-                  .filter_selffinds()
-                  .assign_points(points_dict=points_dict)
-                  .sort_by_date(ascending=True))
+        result = (
+            self.processor.filter_selffinds()
+            .assign_points(points_dict=points_dict)
+            .sort_by_date(ascending=True)
+        )
 
         df = result.get_dataframe()
 
@@ -196,15 +197,15 @@ class TestObservationProcessor:
         assert len(df) == 3
 
         # Should have points assigned
-        assert 'points' in df.columns
+        assert "points" in df.columns
 
         # Should be sorted
-        dates = df['datetime'].tolist()
+        dates = df["datetime"].tolist()
         assert dates == sorted(dates)
 
     def test_load_save_csv(self):
         """Test saving and loading CSV"""
-        with tempfile.NamedTemporaryFile(suffix='.csv', delete=False) as f:
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
             temp_csv = f.name
 
         try:

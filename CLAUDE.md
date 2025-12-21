@@ -37,11 +37,14 @@ python -m scripts.getobservations
 # Or use Makefile
 make test              # Run unit tests
 make test-integration  # Run integration tests (slow)
-make test-all         # Run all tests
-make migtrend
-make ranking
-make observations
-make clean
+make test-all          # Run all tests
+make style             # Format code with black & isort
+make style-check       # Check code style compliance
+make lint              # Run flake8 linter
+make migtrend          # Generate migration trend plots
+make ranking           # Update self-find ranking
+make observations      # Scrape observations
+make clean             # Clean up cache files
 ```
 
 **Output Location**: All output files (CSV, KML, TXT, PNG) are saved to the `results/` directory, which is created automatically and git-ignored.
@@ -97,6 +100,62 @@ make test-all
 **CI Setup**: GitHub Actions workflow (`.github/workflows/python-tests.yml`) mocks passwords using `tests/mocks/passwords.py`. For local testing, create `passwords/passwords.py` based on `passwords/passwords-example.py`.
 
 **Note**: Only run unit tests in CI/automated environments. Integration tests require manual execution due to bot detection and potential observation changes on the website.
+
+## Code Style
+
+The project uses automated code formatting and linting tools to maintain consistent code style:
+
+### Tools
+
+- **black** - Automatic code formatter (line length: 100)
+- **isort** - Import statement organizer
+- **flake8** - Linter for code quality and style checking
+
+### Configuration Files
+
+- `pyproject.toml` - Black and isort settings
+- `.flake8` - Flake8 linting rules
+
+### Usage
+
+```bash
+# Check code style compliance (no changes)
+make style-check
+
+# Automatically fix code style issues
+make style
+# or: make style-fix
+
+# Run only linter (no automatic fixes)
+make lint
+```
+
+### Running Style Tools
+
+**Before committing code**, run:
+```bash
+make style        # Auto-format code with black & isort
+make style-check  # Verify compliance
+```
+
+### Style Rules
+
+- **Line length**: 100 characters max
+- **Import ordering**: Standard library → Third-party → First-party (classes, scripts, passwords)
+- **String quotes**: Double quotes preferred by black
+- **Trailing commas**: Required in multi-line structures
+- **Naming conventions**: **snake_case enforced**
+  - Functions: `get_soup()`, `create_web_driver()`
+  - Variables: `page_soup`, `obs_links`, `base_link`
+  - Parameters: `link`, `species_filter`, `date_ranges`
+  - Classes: `CapWords` (ScrapeBase, ObservationScraper)
+
+The formatters run on `classes/`, `scripts/`, and `tests/` directories.
+
+**Important**: All Python code uses snake_case naming (enforced by pep8-naming plugin). This includes:
+- Method names: `set_param()` not `SetParam()`
+- Attribute names: `self.link` not `self.Link`
+- Function names: `get_month_end()` not `GetMonthEnd()`
 
 ## Architecture
 
@@ -168,14 +227,21 @@ processor.filter_selffinds().assign_points().to_kml("selffinds.kml")
 
 **`classes/base.py:ScrapeBase`**
 - Manages Selenium WebDriver setup and configuration
-- Provides `GetSoup()` method for BeautifulSoup parsing
+- Provides `get_soup()` method for BeautifulSoup parsing
 - Handles Chrome options (headless mode, extensions, GPU)
 - Uses `webdriver_manager` for automatic ChromeDriver management
+
+### Constants
+
+**`classes/constants.py`**
+- Centralizes all magic numbers (timeouts, default values, thresholds)
+- Imported and used throughout scraper and processor classes
+- Adjust these values to tune scraper behavior
 
 ## Script Purposes
 
 - **`scripts/migrationtrend.py`**: Generates migration trend plots for multiple species
-- **`scripts/migrationtrendfun.py`**: Core function `GetSpeciesPlot()` using MigrationScraper → MigrationProcessor pattern
+- **`scripts/migrationtrendfun.py`**: Core function `get_species_plot()` using MigrationScraper → MigrationProcessor pattern
 - **`scripts/getobservations.py`**: Scrapes observations using ObservationCollectionScraper → ObservationProcessor pattern
 - **`scripts/updateranking.py`**: Updates self-find competition ranking with filtering and point assignment
 
@@ -210,11 +276,25 @@ The directory is created automatically and is git-ignored.
 - GPS coordinates are obscured/revealed
 - Any other field changes on the website
 
+## Logging
+
+The project uses Python's built-in `logging` module for all output:
+
+- **Configuration**: Main scripts (in `scripts/`) configure logging with `logging.basicConfig()` at INFO level
+- **Format**: `%(asctime)s - %(name)s - %(levelname)s - %(message)s`
+- **Log Levels Used**:
+  - `INFO`: Normal operational output (progress updates, page numbers, percentages, file saves/loads, completion messages)
+  - `WARNING`: Timeouts, missing data, non-critical issues
+  - `DEBUG`: Debugging output (HTML page dumps, internal state)
+- **Per-Module Loggers**: Each module creates its own logger with `logger = logging.getLogger(__name__)`
+
+To see debug messages (like HTML dumps), configure scripts with `level=logging.DEBUG` instead of `level=logging.INFO`.
+
 ## Important Notes
 
 - **Password Management**: Never commit `passwords/passwords.py`. Use the example file as template.
-- **Language Setting**: Scraper sets language to Dutch ('nl') for consistent results via `SetLang()` method
-- **Headless Mode**: Chrome headless mode commented out by default in `base.py:21` - uncomment for background execution
+- **Language Setting**: Scraper sets language to Dutch ('nl') for consistent results via `set_lang()` method
+- **Headless Mode**: Chrome headless mode commented out by default in `base.py:23` - uncomment for background execution
 - **Module Execution**: Always run scripts as modules (`python -m scripts.scriptname`) to ensure proper imports
 - **Output Location**: All results automatically saved to `results/` directory
 - **Reprocessing**: Can load saved CSV files and reprocess with different parameters without re-scraping
