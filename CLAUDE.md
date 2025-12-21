@@ -8,6 +8,12 @@ ObservadoScraper is a Python-based web scraper for waarneming.nl (Dutch nature o
 
 **Architecture**: Modular design separating data gathering (scrapers) from data processing (processors), with pandas DataFrames as the intermediate format.
 
+## TODO - Cleanup Tasks
+
+### Medium Priority
+- [ ] **Replace print with logging** - Replace ~29 print statements in classes/ with Python logging module
+- [ ] **Extract magic numbers** - Move hardcoded values (timeouts, sleep values) to named constants
+
 ## Environment Setup
 
 Uses Conda for environment management:
@@ -227,14 +233,14 @@ processor.filter_selffinds().assign_points().to_kml("selffinds.kml")
 
 **`classes/base.py:ScrapeBase`**
 - Manages Selenium WebDriver setup and configuration
-- Provides `GetSoup()` method for BeautifulSoup parsing
+- Provides `get_soup()` method for BeautifulSoup parsing
 - Handles Chrome options (headless mode, extensions, GPU)
 - Uses `webdriver_manager` for automatic ChromeDriver management
 
 ## Script Purposes
 
 - **`scripts/migrationtrend.py`**: Generates migration trend plots for multiple species
-- **`scripts/migrationtrendfun.py`**: Core function `GetSpeciesPlot()` using MigrationScraper → MigrationProcessor pattern
+- **`scripts/migrationtrendfun.py`**: Core function `get_species_plot()` using MigrationScraper → MigrationProcessor pattern
 - **`scripts/getobservations.py`**: Scrapes observations using ObservationCollectionScraper → ObservationProcessor pattern
 - **`scripts/updateranking.py`**: Updates self-find competition ranking with filtering and point assignment
 
@@ -272,8 +278,8 @@ The directory is created automatically and is git-ignored.
 ## Important Notes
 
 - **Password Management**: Never commit `passwords/passwords.py`. Use the example file as template.
-- **Language Setting**: Scraper sets language to Dutch ('nl') for consistent results via `SetLang()` method
-- **Headless Mode**: Chrome headless mode commented out by default in `base.py:21` - uncomment for background execution
+- **Language Setting**: Scraper sets language to Dutch ('nl') for consistent results via `set_lang()` method
+- **Headless Mode**: Chrome headless mode commented out by default in `base.py:23` - uncomment for background execution
 - **Module Execution**: Always run scripts as modules (`python -m scripts.scriptname`) to ensure proper imports
 - **Output Location**: All results automatically saved to `results/` directory
 - **Reprocessing**: Can load saved CSV files and reprocess with different parameters without re-scraping

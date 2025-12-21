@@ -33,6 +33,15 @@ class ObservationProcessor:
         selffind_keywords = ["Self", "self", "qwerty", "Qwerty"]
 
         def is_selffind(description):
+            """
+            Check if an observation description contains self-find keywords.
+
+            Args:
+                description: Observation description text (may be NaN or empty)
+
+            Returns:
+                True if description contains any self-find keyword, False otherwise
+            """
             if pd.isna(description) or description == "":
                 return False
             return any(keyword in str(description) for keyword in selffind_keywords)

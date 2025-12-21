@@ -48,10 +48,16 @@ class ObservationCollectionScraper(ScrapeBase):
         )
         button.click()
 
-    def _get_observation_links(self):
+    def _paginate_and_collect(self, link_extractor):
         """
-        Collects all observation links from paginated overview pages.
-        Returns a list of observation URLs.
+        Common pagination logic for collecting observation links.
+
+        Args:
+            link_extractor: Callable that takes the current page soup and returns
+                          a list of observation links to add from this page
+
+        Returns:
+            List of observation URLs collected from all pages
         """
         obs_links = []
         base_link = self.link[0:-1]
@@ -59,7 +65,6 @@ class ObservationCollectionScraper(ScrapeBase):
 
         print("Starting to retrieve links from overview pages")
 
-        # Get links from page to observations
         is_end = False
         while not is_end:
             time.sleep(self.wait)
@@ -69,13 +74,14 @@ class ObservationCollectionScraper(ScrapeBase):
             self.link = base_link + str(page)
             self.get_soup()
 
-            for link in self.page_soup.findAll("a", attrs={"href": re.compile("^/observation/")}):
-                obs_links.append(link.get("href"))
+            # Extract links from current page using provided function
+            page_links = link_extractor(self.page_soup)
+            obs_links.extend(page_links)
 
-            # Check if on last page, if so: end loop
+            # Check if on last page
             try:
                 last_page = self.page_soup.findAll("li", attrs={"last"})[0].find("a").get("href")
-            except:  # Exception for one page
+            except (IndexError, AttributeError, KeyError):  # Exception for one page
                 last_page = None
 
             if last_page is None:
@@ -86,6 +92,21 @@ class ObservationCollectionScraper(ScrapeBase):
                 )
 
         return obs_links
+
+    def _get_observation_links(self):
+        """
+        Collects all observation links from paginated overview pages.
+        Returns a list of observation URLs.
+        """
+
+        def extract_all_links(page_soup):
+            """Extract all observation links from page."""
+            return [
+                link.get("href")
+                for link in page_soup.findAll("a", attrs={"href": re.compile("^/observation/")})
+            ]
+
+        return self._paginate_and_collect(extract_all_links)
 
     def _get_observation_links_filtered(self, species_filter):
         """
@@ -97,53 +118,24 @@ class ObservationCollectionScraper(ScrapeBase):
 
         Returns a list of observation URLs.
         """
-        obs_links = []
-        base_link = self.link[0:-1]
-        page = 0
 
-        print("Starting to retrieve links from overview pages")
+        def extract_filtered_links(page_soup):
+            """Extract observation links filtered by species."""
+            links = [
+                link.get("href")
+                for link in page_soup.findAll("a", attrs={"href": re.compile("^/observation/")})
+            ]
 
-        is_end = False
-        while not is_end:
-            time.sleep(self.wait)
-            page += 1
+            species = page_soup.findAll("span", {"class": ["species-common-name"]})
+            filtered_links = []
 
-            print(f"Currently in page {page}\r", end="")
-            self.link = base_link + str(page)
-            self.get_soup()
+            for i, sp in enumerate(species):
+                if sp.get_text() in species_filter:
+                    filtered_links.append(links[i])
 
-            links = []
-            for link in self.page_soup.findAll("a", attrs={"href": re.compile("^/observation/")}):
-                links.append(link.get("href"))
+            return filtered_links
 
-            species = self.page_soup.findAll("span", {"class": ["species-common-name"]})
-            potential_indices = []
-
-            i = 0
-            for sp in species:
-                test_species = sp.get_text()
-                if test_species in species_filter:
-                    potential_indices.append(i)
-                i += 1
-
-            # Get potential links
-            for i in potential_indices:
-                obs_links.append(links[i])
-
-            # Check if on last page
-            try:
-                last_page = self.page_soup.findAll("li", attrs={"last"})[0].find("a").get("href")
-            except:
-                last_page = None
-
-            if last_page is None:
-                is_end = True
-                print(f"Currently in page {page}")
-                print(
-                    f"Found {page} pages of observations having a total of {len(obs_links)} observations.\n"
-                )
-
-        return obs_links
+        return self._paginate_and_collect(extract_filtered_links)
 
     def scrape(self, species_filter=None):
         """
