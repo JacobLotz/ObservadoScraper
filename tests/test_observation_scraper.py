@@ -1,7 +1,9 @@
 import os
+import pytest
 from unittest.mock import Mock, patch, MagicMock
 from bs4 import BeautifulSoup
 from classes import ObservationScraper
+from classes.base import ScrapeBase
 
 
 class TestObservationScraper:
@@ -40,9 +42,9 @@ class TestObservationScraper:
         assert result['year'] == '2025'
         assert result['month'] == '12'
         assert result['day'] == '14'
-        assert result['time'] == '13:54'
+        assert result['time'] == '-'
         assert result['month_day'] == '14-12'
-        assert result['datetime'] == '2025-12-14 13:54'
+        assert result['datetime'] == '2025-12-14'
         assert result['location_name'] == 'Ter Heijde - Zandmotor (ZH)'
         assert result['latitude'] == '52.05759'
         assert result['longitude'] == '4.19180'
@@ -67,9 +69,9 @@ class TestObservationScraper:
         assert result['year'] == '2022'
         assert result['month'] == '10'
         assert result['day'] == '23'
-        assert result['time'] == '12:20'
+        assert result['time'] == '-'
         assert result['month_day'] == '23-10'
-        assert result['datetime'] == '2022-10-23 12:20'
+        assert result['datetime'] == '2022-10-23'
         assert result['location_name'] == 'Maasvlakte 2 (ZH)'
         assert result['latitude'] == '51.95211'
         assert result['longitude'] == '3.96657'

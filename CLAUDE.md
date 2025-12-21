@@ -35,7 +35,9 @@ python -m scripts.updateranking
 python -m scripts.getobservations
 
 # Or use Makefile
-make test
+make test              # Run unit tests
+make test-integration  # Run integration tests (slow)
+make test-all         # Run all tests
 make migtrend
 make ranking
 make observations
@@ -46,25 +48,59 @@ make clean
 
 ## Testing
 
+### Unit Tests (Fast, No Internet)
+
 ```bash
-# Run all tests (36 tests, fast with mocks)
-pytest
+# Run all unit tests (38 tests, fast with mocks)
+make test
+# or: make test-unit
+# or: pytest
 
 # Run specific test categories
 pytest tests/test_observation_processor.py  # Processor tests with CSV mocks
 pytest tests/test_observation_scraper.py    # Scraper tests with HTML mocks
-
-# Run legacy integration tests (slow, requires live scraping)
-pytest -m integration
 ```
 
-**Test Coverage**: 36 passing tests using HTML and CSV mocks. No live scraping needed for unit tests.
+**Test Coverage**: 38 passing tests using HTML and CSV mocks. No live scraping needed for unit tests.
+
+### Integration Tests (Slow, Requires Internet)
+
+```bash
+# Run all integration tests (validates mocks against real website)
+make test-integration
+
+# Or run individual integration tests
+python tests/verify_mock_382543115.py      # Normal observation
+python tests/verify_mock_257848200.py      # Self-find observation
+python tests/verify_mock_obscured.py       # Obscured GPS observation
+python tests/verify_mock_list_page.py      # Observations list page
+```
+
+**Integration Coverage**: 4 verification scripts that scrape real waarneming.nl pages to validate mocks. See `tests/README_INTEGRATION.md` for details.
+
+**Important**: Integration tests may fail if observations on waarneming.nl are edited. Observations can be modified by their observers (e.g., removing time values, changing descriptions). When integration tests fail:
+
+1. Run the failing test individually to see the mismatch
+2. Update the corresponding mock HTML file in `tests/mocks/`
+3. Update the corresponding unit test assertions in `tests/test_observation_scraper.py`
+4. Verify all unit tests still pass: `make test`
+
+Example: Observations 382543115 and 257848200 had their time values removed from the website in December 2024, requiring mock updates.
+
+### Run All Tests
+
+```bash
+# Run both unit and integration tests
+make test-all
+```
 
 **CI Setup**: GitHub Actions workflow (`.github/workflows/python-tests.yml`) mocks passwords using `tests/mocks/passwords.py`. For local testing, create `passwords/passwords.py` based on `passwords/passwords-example.py`.
 
+**Note**: Only run unit tests in CI/automated environments. Integration tests require manual execution due to bot detection and potential observation changes on the website.
+
 ## Architecture
 
-### Modular Design (New - Use This)
+### Modular Design
 
 **Workflow**: Scrape → Save CSV → Load CSV → Process → Export
 
@@ -128,14 +164,6 @@ processor = ObservationProcessor(df)
 processor.filter_selffinds().assign_points().to_kml("selffinds.kml")
 ```
 
-### Legacy Classes (Still Available)
-
-- **`classes/obs.py:Observation`** - Individual observation (legacy)
-- **`classes/obscol.py:ObsCollection`** - Collection of observations (legacy)
-- **`classes/mig.py:MigClass`** - Migration trend data (legacy)
-
-**Note**: New code should use the modular scrapers/processors. Legacy classes maintained for backward compatibility.
-
 ### Base Class
 
 **`classes/base.py:ScrapeBase`**
@@ -166,23 +194,30 @@ The directory is created automatically and is git-ignored.
 ### Unit Tests (Fast - Use Mocks)
 
 **HTML Mocks** (`tests/mocks/*.html`) - For testing scrapers without Selenium:
-- `observation_page.html` - Normal observation
-- `observation_page_obscured.html` - Obscured GPS coordinates
+- `observation_page.html` - Normal observation (from real observation 382543115)
+- `observation_257848200.html` - Vale Gierzwaluw self-find observation (real observation)
+- `observation_373437223.html` - Wolf with obscured GPS (real observation)
+- `observations_list_page.html` - User observations list (from real list page)
+- `observation_page_obscured.html` - Havik obscured GPS (legacy synthetic mock)
 
 **CSV Mocks** (`tests/mocks/*.csv`) - For testing processors without scraping:
 - `observations_mock.csv` - Sample observation data
 - `migration_mock.csv` - Sample migration data
 
-### Integration Tests (Slow - Skipped by Default)
-
-Marked with `@pytest.mark.integration` and skipped unless explicitly run with `pytest -m integration`.
+**Mock Maintenance**: Mocks based on real observations may become outdated when observers edit their observations on waarneming.nl. Integration tests detect these changes. Update mocks when:
+- Times are added/removed from observations
+- Descriptions are modified
+- GPS coordinates are obscured/revealed
+- Any other field changes on the website
 
 ## Important Notes
 
 - **Password Management**: Never commit `passwords/passwords.py`. Use the example file as template.
-- **Language Setting**: Scraper sets language to Dutch ('nl') for consistent results
+- **Language Setting**: Scraper sets language to Dutch ('nl') for consistent results via `SetLang()` method
 - **Headless Mode**: Chrome headless mode commented out by default in `base.py:21` - uncomment for background execution
 - **Module Execution**: Always run scripts as modules (`python -m scripts.scriptname`) to ensure proper imports
 - **Output Location**: All results automatically saved to `results/` directory
 - **Reprocessing**: Can load saved CSV files and reprocess with different parameters without re-scraping
 - **Method Chaining**: Processors support chaining: `processor.filter_selffinds().assign_points().to_kml("output.kml")`
+- **Bot Detection**: The website uses Cloudflare protection. Integration tests handle this with wait times and language setting, but may still fail occasionally. Manual execution (not pytest) works better.
+- **Mock Drift**: HTML mocks based on real observations can become outdated when observations are edited on the website. Run integration tests periodically to detect and fix drift.

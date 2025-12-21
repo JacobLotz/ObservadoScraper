@@ -2,6 +2,7 @@
 
 # Python environment
 PYTHON=python
+CONDA_ENV=observadoscraper
 SCRIPT=scripts/migrationtrend.py
 MODULE=scripts.migrationtrend
 ENV_NAME=envfile
@@ -40,5 +41,39 @@ ranking:
 observations:
 	python -m scripts.getobservations
 
+# Testing targets
+.PHONY: test test-unit test-integration test-all
+
+# Run unit tests only (fast, no internet required)
 test:
-	pytest
+	@echo "Running unit tests..."
+	conda run -n $(CONDA_ENV) pytest -v
+
+# Alias for test
+test-unit: test
+
+# Run integration tests (slow, requires internet, may hit bot detection)
+test-integration:
+	@echo "Running integration tests..."
+	@echo "These tests scrape the real website and may take a while..."
+	@echo ""
+	@echo "Test 1/4: Normal observation (Gewone Zeehond)..."
+	conda run -n $(CONDA_ENV) python tests/verify_mock_382543115.py
+	@echo ""
+	@echo "Test 2/4: Self-find observation (Vale Gierzwaluw)..."
+	conda run -n $(CONDA_ENV) python tests/verify_mock_257848200.py
+	@echo ""
+	@echo "Test 3/4: Obscured observation (Wolf)..."
+	conda run -n $(CONDA_ENV) python tests/verify_mock_obscured.py
+	@echo ""
+	@echo "Test 4/4: Observations list page..."
+	conda run -n $(CONDA_ENV) python tests/verify_mock_list_page.py
+	@echo ""
+	@echo "All integration tests complete!"
+
+# Run all tests (unit + integration)
+test-all: test-unit
+	@echo ""
+	@echo "Unit tests complete. Starting integration tests..."
+	@echo ""
+	@$(MAKE) test-integration
