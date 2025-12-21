@@ -1,14 +1,7 @@
 import datetime
 import calendar
-import pytest
-from unittest.mock import patch, MagicMock
-import numpy as np
-import matplotlib.pyplot as plt
 
 from scripts.migrationtrendfun import GetMonthEnd, GetStartDates, GetEndDates
-from classes import *
-
-import numpy as np
 
 def test_GetMonthEnd():
     assert GetMonthEnd(datetime.date(2024, 1, 15)) == 31

@@ -1,9 +1,7 @@
 import os
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock
 from bs4 import BeautifulSoup
 from classes import ObservationScraper
-from classes.base import ScrapeBase
 
 
 class TestObservationScraper:

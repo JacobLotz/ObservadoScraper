@@ -1,6 +1,5 @@
 # Import classes
 from datetime import date
-import pandas as pd
 import os
 
 from classes import ObservationCollectionScraper, ObservationProcessor

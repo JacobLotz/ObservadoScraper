@@ -1,5 +1,5 @@
 import os
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from bs4 import BeautifulSoup
 from classes import ObservationCollectionScraper
 

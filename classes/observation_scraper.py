@@ -1,5 +1,4 @@
 from .base import ScrapeBase
-import pandas as pd
 
 # Scraper class for extracting data from a single observation page
 class ObservationScraper(ScrapeBase):
