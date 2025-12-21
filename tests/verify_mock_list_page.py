@@ -63,7 +63,7 @@ def verify_list_mock():
 
     # Create a real browser instance
     base = ScrapeBase(url)
-    base.CreateWebDriver()
+    base.create_web_driver()
 
     try:
         # Set language to Dutch first
@@ -76,7 +76,7 @@ def verify_list_mock():
             wait = WebDriverWait(base.browser, 10)
             button = wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, f"button[name='language'][value='{base.Lang}']")
+                    (By.CSS_SELECTOR, f"button[name='language'][value='{base.lang}']")
                 )
             )
             button.click()
@@ -116,7 +116,7 @@ def verify_list_mock():
 
     finally:
         # Clean up browser
-        base.CloseWebDriver()
+        base.close_web_driver()
 
     print("\n2. Loading mock HTML...")
     mock_soup = load_mock_html("observations_list_page.html")

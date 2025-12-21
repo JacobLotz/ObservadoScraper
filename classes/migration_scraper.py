@@ -18,18 +18,18 @@ class MigrationScraper(ScrapeBase):
     """
 
     def __init__(self, Link):
-        self.Link = Link
-        self.SetParam()
+        self.link = Link
+        self.set_param()
 
-    def UpdateLink(self, Link):
+    def update_link(self, Link):
         """Update the link for scraping a different date range or species"""
-        self.Link = Link
+        self.link = Link
 
     def _get_soup_with_wait(self):
         """
         Load the page and wait for map elements to render.
         """
-        self.browser.get(self.Link)
+        self.browser.get(self.link)
         wait = WebDriverWait(self.browser, 4)
 
         try:
@@ -60,7 +60,7 @@ class MigrationScraper(ScrapeBase):
         except Exception as e:
             print("Timed out waiting for map to load.")
 
-        self.PageSoup = soup(self.browser.page_source, "html.parser")
+        self.page_soup = soup(self.browser.page_source, "html.parser")
 
     def _get_n_squares(self):
         """
@@ -73,7 +73,7 @@ class MigrationScraper(ScrapeBase):
             )
         except TimeoutException:
             print("Timed out waiting for element, continuing...")
-            print(self.Link)
+            print(self.link)
             print("\n.")
             return 0
 
@@ -104,7 +104,7 @@ class MigrationScraper(ScrapeBase):
             f"&map_type=grid1k"
         )
 
-        self.UpdateLink(link)
+        self.update_link(link)
         self._get_soup_with_wait()
         n_squares = self._get_n_squares()
 
@@ -128,14 +128,14 @@ class MigrationScraper(ScrapeBase):
         Returns:
             pandas DataFrame with columns: start_date, end_date, n_squares, species_id
         """
-        self.CreateWebDriver()
+        self.create_web_driver()
 
         results = []
         for start_date, end_date in date_ranges:
             result = self.scrape_date_range(species_id, start_date, end_date)
             results.append(result)
 
-        self.CloseWebDriver()
+        self.close_web_driver()
 
         df = pd.DataFrame(results)
         return df

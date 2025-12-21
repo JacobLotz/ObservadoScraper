@@ -13,16 +13,16 @@ class TestScrapeBase:
         print(f"Tearing down {method}")
 
     def test_SetParam(self):
-        self.base.SetParam()
+        self.base.set_param()
         assert True
 
     def test_CreateWebDriver(self):
-        self.base.CreateWebDriver()
-        self.base.CloseWebDriver()
+        self.base.create_web_driver()
+        self.base.close_web_driver()
         assert True
 
     def test_GetSoup(self):
-        self.base.CreateWebDriver()
-        self.base.GetSoup()
-        self.base.CloseWebDriver()
+        self.base.create_web_driver()
+        self.base.get_soup()
+        self.base.close_web_driver()
         assert True

@@ -9,31 +9,31 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # Base class containing methods to get soup and set parameters.
 class ScrapeBase:
-    def __init__(self, Link):
-        self.Link = Link
-        self.SetParam()
+    def __init__(self, link):
+        self.link = link
+        self.set_param()
 
-    def SetParam(self):
-        self.Wait = 0
-        self.Lang = "nl"
+    def set_param(self):
+        self.wait = 0
+        self.lang = "nl"
         self.chrome_options = Options()
         self.chrome_options.add_argument("--disable-extensions")
         self.chrome_options.add_argument("--disable-gpu")
         self.chrome_options.add_argument("--no-sandbox")  # linux only
         # self.chrome_options.add_argument("--headless")
 
-    def GetSoup(self):
-        self.browser.get(self.Link)
-        time.sleep(self.Wait)
-        self.PageSoup = soup(self.browser.page_source, "html.parser")
+    def get_soup(self):
+        self.browser.get(self.link)
+        time.sleep(self.wait)
+        self.page_soup = soup(self.browser.page_source, "html.parser")
 
-    def PrintSoup(self):
-        print(self.PageSoup.prettify)
+    def print_soup(self):
+        print(self.page_soup.prettify)
 
-    def CreateWebDriver(self):
+    def create_web_driver(self):
         self.browser = webdriver.Chrome(
             service=Service(ChromeDriverManager().install()), options=self.chrome_options
         )
 
-    def CloseWebDriver(self):
+    def close_web_driver(self):
         self.browser.quit()

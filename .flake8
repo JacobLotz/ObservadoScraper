@@ -33,13 +33,24 @@ ignore =
     W503,
     W504,
     B001,
-    B950
+    B950,
+    N802,
+    N803,
+    N806,
+    N812,
+    N813
 
 # Enable specific checks
-select = C,E,F,W,B,B950
+select = C,E,F,W,B,B950,N
 
 # Maximum complexity
 max-complexity = 15
+
+# Naming conventions (enforce snake_case)
+# N801: class name should use CapWords convention
+# N802: function name should be lowercase
+# N803: argument name should be lowercase
+# N806: variable should be lowercase
 
 # Show source code for errors
 show-source = True

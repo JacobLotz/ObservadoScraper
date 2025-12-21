@@ -21,10 +21,10 @@ class ObservationCollectionScraper(ScrapeBase):
     Returns a pandas DataFrame with all observation data.
     """
 
-    def __init__(self, Link):
-        super().__init__(Link)
+    def __init__(self, link):
+        super().__init__(link)
 
-    def LogIn(self):
+    def log_in(self):
         """Log into old website"""
         url = "https://waarneming.nl/accounts/login/?next=/"
         self.browser.get(url)
@@ -34,7 +34,7 @@ class ObservationCollectionScraper(ScrapeBase):
         password.send_keys(password_in)
         password.send_keys(Keys.RETURN)
 
-    def SetLang(self):
+    def set_lang(self):
         """Set language for new website"""
         url = "https://waarneming.nl/generic/select-language-modal/"
         self.browser.get(url)
@@ -43,7 +43,7 @@ class ObservationCollectionScraper(ScrapeBase):
         wait = WebDriverWait(self.browser, 10)
         button = wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, f"button[name='language'][value='{self.Lang}']")
+                (By.CSS_SELECTOR, f"button[name='language'][value='{self.lang}']")
             )
         )
         button.click()
@@ -54,7 +54,7 @@ class ObservationCollectionScraper(ScrapeBase):
         Returns a list of observation URLs.
         """
         obs_links = []
-        base_link = self.Link[0:-1]
+        base_link = self.link[0:-1]
         page = 0
 
         print("Starting to retrieve links from overview pages")
@@ -62,19 +62,19 @@ class ObservationCollectionScraper(ScrapeBase):
         # Get links from page to observations
         is_end = False
         while not is_end:
-            time.sleep(self.Wait)
+            time.sleep(self.wait)
             page += 1
 
             print(f"Currently in page {page}\r", end="")
-            self.Link = base_link + str(page)
-            self.GetSoup()
+            self.link = base_link + str(page)
+            self.get_soup()
 
-            for link in self.PageSoup.findAll("a", attrs={"href": re.compile("^/observation/")}):
+            for link in self.page_soup.findAll("a", attrs={"href": re.compile("^/observation/")}):
                 obs_links.append(link.get("href"))
 
             # Check if on last page, if so: end loop
             try:
-                last_page = self.PageSoup.findAll("li", attrs={"last"})[0].find("a").get("href")
+                last_page = self.page_soup.findAll("li", attrs={"last"})[0].find("a").get("href")
             except:  # Exception for one page
                 last_page = None
 
@@ -98,25 +98,25 @@ class ObservationCollectionScraper(ScrapeBase):
         Returns a list of observation URLs.
         """
         obs_links = []
-        base_link = self.Link[0:-1]
+        base_link = self.link[0:-1]
         page = 0
 
         print("Starting to retrieve links from overview pages")
 
         is_end = False
         while not is_end:
-            time.sleep(self.Wait)
+            time.sleep(self.wait)
             page += 1
 
             print(f"Currently in page {page}\r", end="")
-            self.Link = base_link + str(page)
-            self.GetSoup()
+            self.link = base_link + str(page)
+            self.get_soup()
 
             links = []
-            for link in self.PageSoup.findAll("a", attrs={"href": re.compile("^/observation/")}):
+            for link in self.page_soup.findAll("a", attrs={"href": re.compile("^/observation/")}):
                 links.append(link.get("href"))
 
-            species = self.PageSoup.findAll("span", {"class": ["species-common-name"]})
+            species = self.page_soup.findAll("span", {"class": ["species-common-name"]})
             potential_indices = []
 
             i = 0
@@ -132,7 +132,7 @@ class ObservationCollectionScraper(ScrapeBase):
 
             # Check if on last page
             try:
-                last_page = self.PageSoup.findAll("li", attrs={"last"})[0].find("a").get("href")
+                last_page = self.page_soup.findAll("li", attrs={"last"})[0].find("a").get("href")
             except:
                 last_page = None
 
@@ -159,8 +159,8 @@ class ObservationCollectionScraper(ScrapeBase):
         print("Starting to scrape observation collection")
 
         # Get links to relevant observations
-        self.CreateWebDriver()
-        self.SetLang()
+        self.create_web_driver()
+        self.set_lang()
 
         if species_filter:
             obs_links = self._get_observation_links_filtered(species_filter)
@@ -172,7 +172,7 @@ class ObservationCollectionScraper(ScrapeBase):
         observations = []
 
         for i, link in enumerate(obs_links):
-            time.sleep(self.Wait)
+            time.sleep(self.wait)
 
             progress = int((i + 1) / len(obs_links) * 100)
             if progress < 100:
@@ -187,7 +187,7 @@ class ObservationCollectionScraper(ScrapeBase):
             if obs_data:  # Skip if no GPS data
                 observations.append(obs_data)
 
-        self.CloseWebDriver()
+        self.close_web_driver()
 
         # Convert to DataFrame
         df = pd.DataFrame(observations)

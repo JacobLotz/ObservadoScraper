@@ -21,3 +21,4 @@ dependencies:
     - simplekml
     - webdriver_manager
     - flake8-bugbear
+    - pep8-naming

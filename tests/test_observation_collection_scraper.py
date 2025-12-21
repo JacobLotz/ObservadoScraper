@@ -27,7 +27,7 @@ class TestObservationCollectionScraper:
         # Mock the browser and page loading
         mock_browser = Mock()
         scraper.browser = mock_browser
-        scraper.Wait = 0
+        scraper.wait = 0
 
         # Create a single page mock (no pagination)
         html_single_page = """
@@ -46,8 +46,8 @@ class TestObservationCollectionScraper:
         </html>
         """
 
-        scraper.PageSoup = BeautifulSoup(html_single_page, "html.parser")
-        scraper.GetSoup = Mock()
+        scraper.page_soup = BeautifulSoup(html_single_page, "html.parser")
+        scraper.get_soup = Mock()
 
         # Call the internal method
         links = scraper._get_observation_links()
@@ -64,7 +64,7 @@ class TestObservationCollectionScraper:
         # Mock the browser
         mock_browser = Mock()
         scraper.browser = mock_browser
-        scraper.Wait = 0
+        scraper.wait = 0
 
         # Create HTML with species names
         html_with_species = """
@@ -90,8 +90,8 @@ class TestObservationCollectionScraper:
         </html>
         """
 
-        scraper.PageSoup = BeautifulSoup(html_with_species, "html.parser")
-        scraper.GetSoup = Mock()
+        scraper.page_soup = BeautifulSoup(html_with_species, "html.parser")
+        scraper.get_soup = Mock()
 
         # Filter for only Boswitje
         species_filter = {"Boswitje"}
@@ -149,11 +149,11 @@ class TestObservationCollectionScraper:
         scraper = ObservationCollectionScraper("https://waarneming.nl/observations/?page=1")
 
         # Mock browser and webdriver methods
-        scraper.CreateWebDriver = Mock()
-        scraper.CloseWebDriver = Mock()
-        scraper.SetLang = Mock()
+        scraper.create_web_driver = Mock()
+        scraper.close_web_driver = Mock()
+        scraper.set_lang = Mock()
         scraper.browser = Mock()
-        scraper.Wait = 0
+        scraper.wait = 0
 
         # Mock _get_observation_links to return test links
         scraper._get_observation_links = Mock(
@@ -206,6 +206,6 @@ class TestObservationCollectionScraper:
         assert df["latitude"].tolist() == ["52.1", "52.2"]
 
         # Verify methods were called
-        scraper.CreateWebDriver.assert_called_once()
-        scraper.SetLang.assert_called_once()
-        scraper.CloseWebDriver.assert_called_once()
+        scraper.create_web_driver.assert_called_once()
+        scraper.set_lang.assert_called_once()
+        scraper.close_web_driver.assert_called_once()

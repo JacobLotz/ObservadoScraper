@@ -30,10 +30,10 @@ class TestObservationScraper:
 
         # Mock the GetSoup method to use our HTML mock
         mock_soup = self._load_mock_html("observation_page.html")
-        scraper.PageSoup = mock_soup
+        scraper.page_soup = mock_soup
 
         # Scrape without calling GetSoup (which would use Selenium)
-        scraper.GetSoup = Mock()  # Mock out GetSoup
+        scraper.get_soup = Mock()  # Mock out GetSoup
         result = scraper.scrape()
 
         # Verify results
@@ -58,8 +58,8 @@ class TestObservationScraper:
 
         # Mock the GetSoup method to use our HTML mock
         mock_soup = self._load_mock_html("observation_257848200.html")
-        scraper.PageSoup = mock_soup
-        scraper.GetSoup = Mock()
+        scraper.page_soup = mock_soup
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
@@ -85,8 +85,8 @@ class TestObservationScraper:
 
         # Mock the GetSoup method
         mock_soup = self._load_mock_html("observation_page_obscured.html")
-        scraper.PageSoup = mock_soup
-        scraper.GetSoup = Mock()
+        scraper.page_soup = mock_soup
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
@@ -121,8 +121,8 @@ class TestObservationScraper:
         </html>
         """
 
-        scraper.PageSoup = BeautifulSoup(html, "html.parser")
-        scraper.GetSoup = Mock()
+        scraper.page_soup = BeautifulSoup(html, "html.parser")
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
@@ -157,8 +157,8 @@ class TestObservationScraper:
         </html>
         """
 
-        scraper.PageSoup = BeautifulSoup(html, "html.parser")
-        scraper.GetSoup = Mock()
+        scraper.page_soup = BeautifulSoup(html, "html.parser")
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
@@ -179,8 +179,8 @@ class TestObservationScraper:
         </html>
         """
 
-        scraper.PageSoup = BeautifulSoup(html, "html.parser")
-        scraper.GetSoup = Mock()
+        scraper.page_soup = BeautifulSoup(html, "html.parser")
+        scraper.get_soup = Mock()
 
         result = scraper.scrape()
 
@@ -222,8 +222,8 @@ class TestObservationScraper:
             </html>
             """
 
-            scraper.PageSoup = BeautifulSoup(html, "html.parser")
-            scraper.GetSoup = Mock()
+            scraper.page_soup = BeautifulSoup(html, "html.parser")
+            scraper.get_soup = Mock()
 
             result = scraper.scrape()
 

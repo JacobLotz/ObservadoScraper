@@ -144,8 +144,18 @@ make style-check  # Verify compliance
 - **Import ordering**: Standard library → Third-party → First-party (classes, scripts, passwords)
 - **String quotes**: Double quotes preferred by black
 - **Trailing commas**: Required in multi-line structures
+- **Naming conventions**: **snake_case enforced**
+  - Functions: `get_soup()`, `create_web_driver()`
+  - Variables: `page_soup`, `obs_links`, `base_link`
+  - Parameters: `link`, `species_filter`, `date_ranges`
+  - Classes: `CapWords` (ScrapeBase, ObservationScraper)
 
 The formatters run on `classes/`, `scripts/`, and `tests/` directories.
+
+**Important**: All Python code uses snake_case naming (enforced by pep8-naming plugin). This includes:
+- Method names: `set_param()` not `SetParam()`
+- Attribute names: `self.link` not `self.Link`
+- Function names: `get_month_end()` not `GetMonthEnd()`
 
 ## Architecture
 

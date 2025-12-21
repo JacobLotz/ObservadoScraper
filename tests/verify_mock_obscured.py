@@ -54,7 +54,7 @@ def verify_obscured_mock():
 
     # Create a real browser instance
     base = ScrapeBase(url)
-    base.CreateWebDriver()
+    base.create_web_driver()
 
     try:
         # Set language to Dutch first
@@ -67,7 +67,7 @@ def verify_obscured_mock():
             wait = WebDriverWait(base.browser, 10)
             button = wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, f"button[name='language'][value='{base.Lang}']")
+                    (By.CSS_SELECTOR, f"button[name='language'][value='{base.lang}']")
                 )
             )
             button.click()
@@ -109,14 +109,14 @@ def verify_obscured_mock():
 
     finally:
         # Clean up browser
-        base.CloseWebDriver()
+        base.close_web_driver()
 
     print("\n2. Loading mock HTML...")
     # Scrape mock version
     mock_scraper = ObservationScraper(url, Mock())
     mock_soup = load_mock_html("observation_373437223.html")
-    mock_scraper.PageSoup = mock_soup
-    mock_scraper.GetSoup = Mock()
+    mock_scraper.page_soup = mock_soup
+    mock_scraper.get_soup = Mock()
     mock_data = mock_scraper.scrape()
 
     if mock_data is None:
