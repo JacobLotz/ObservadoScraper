@@ -49,6 +49,33 @@ class TestObservationScraper:
         assert 'Self found' in result['description']
         assert result['url'] == 'https://waarneming.nl/observation/382543115/'
 
+    def test_scrape_selffind_observation_257848200(self):
+        """Test scraping observation 257848200 - Vale Gierzwaluw with self-find marker"""
+        mock_browser = Mock()
+        scraper = ObservationScraper("https://waarneming.nl/observation/257848200/", mock_browser)
+
+        # Mock the GetSoup method to use our HTML mock
+        mock_soup = self._load_mock_html('observation_257848200.html')
+        scraper.PageSoup = mock_soup
+        scraper.GetSoup = Mock()
+
+        result = scraper.scrape()
+
+        # Verify results
+        assert result is not None
+        assert result['name'] == 'Vale Gierzwaluw'
+        assert result['year'] == '2022'
+        assert result['month'] == '10'
+        assert result['day'] == '23'
+        assert result['time'] == '12:20'
+        assert result['month_day'] == '23-10'
+        assert result['datetime'] == '2022-10-23 12:20'
+        assert result['location_name'] == 'Maasvlakte 2 (ZH)'
+        assert result['latitude'] == '51.95211'
+        assert result['longitude'] == '3.96657'
+        assert 'self' in result['description']
+        assert result['url'] == 'https://waarneming.nl/observation/257848200/'
+
     def test_scrape_obscured_observation(self):
         """Test scraping an observation with obscured GPS coordinates"""
         mock_browser = Mock()

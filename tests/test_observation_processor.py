@@ -39,6 +39,35 @@ class TestObservationProcessor:
         # Check that non-selffind is excluded
         assert 'Kaasjeskruiddikkopje' not in names
 
+    def test_filter_selffinds_observation_257848200(self):
+        """Test that observation 257848200 is correctly identified as self-find"""
+        # Create DataFrame with observation 257848200 data
+        data = {
+            'name': ['Vale Gierzwaluw'],
+            'datetime': ['2022-10-23 12:20'],
+            'year': ['2022'],
+            'month': ['10'],
+            'day': ['23'],
+            'month_day': ['23-10'],
+            'time': ['12:20'],
+            'location_name': ['Maasvlakte 2 (ZH)'],
+            'latitude': ['51.95211'],
+            'longitude': ['3.96657'],
+            'description': ['Yihaa!! Met Daan eerst vanuit de auto. Snel gekeerd en plaatjes gemaakt vanuit de auto. Gelukkig konden we de auto snel kwijt op een vluchthaven waarna ze snel weer dichterbij kwamen. Ze bleken redelijk honkvast en kwamen elke keer weer terug naar deze locatie. Af en toe op 2 meter langs... self'],
+            'url': ['https://waarneming.nl/observation/257848200/']
+        }
+        df = pd.DataFrame(data)
+        processor = ObservationProcessor(df)
+
+        # Filter for self-finds
+        filtered = processor.filter_selffinds()
+        df_result = filtered.get_dataframe()
+
+        # Should find 1 self-find (description ends with "self")
+        assert len(df_result) == 1
+        assert df_result['name'].iloc[0] == 'Vale Gierzwaluw'
+        assert 'self' in df_result['description'].iloc[0]
+
     def test_assign_points(self):
         """Test assigning points to observations"""
         # Create temporary points file
